@@ -1,0 +1,371 @@
+{smcl}
+{com}{sf}{ul off}{txt}
+{com}. 
+. cd "E:\16GBBACKUPUSB\BACKUP_USB_SEPTEMBER2014\May Baydoun_folder\UK_BIOBANK_PROJECT\UKB_PAPER20_ADI_FOODESERT\DATA"
+{res}E:\16GBBACKUPUSB\BACKUP_USB_SEPTEMBER2014\May Baydoun_folder\UK_BIOBANK_PROJECT\UKB_PAPER20_ADI_FOODESERT\DATA
+{txt}
+{com}. 
+. 
+. use UK_fooddesertdatafinalizedIMD_merged,clear
+{txt}
+{com}. 
+. *******Food desert risk*******
+. su fd
+
+{txt}    Variable {c |}        Obs        Mean    Std. dev.       Min        Max
+{hline 13}{c +}{hline 57}
+{space 10}fd {c |}{res}     41,729    21.68362    10.99818     .92741   76.98687
+{txt}
+{com}. su fd if Country=="England and Wales"
+
+{txt}    Variable {c |}        Obs        Mean    Std. dev.       Min        Max
+{hline 13}{c +}{hline 57}
+{space 10}fd {c |}{res}     34,753    21.28356    10.31505    1.17292   70.82672
+{txt}
+{com}. su fd if Country=="Scottland"
+
+{txt}    Variable {c |}        Obs        Mean    Std. dev.       Min        Max
+{hline 13}{c +}{hline 57}
+{space 10}fd {c |}{res}      6,976    23.67662    13.73859     .92741   76.98687
+{txt}
+{com}. 
+. su zfd
+
+{txt}    Variable {c |}        Obs        Mean    Std. dev.       Min        Max
+{hline 13}{c +}{hline 57}
+{space 9}zfd {c |}{res}     41,729    2.58e-10           1   -1.88724     5.0284
+{txt}
+{com}. su zfd if Country=="England and Wales"
+
+{txt}    Variable {c |}        Obs        Mean    Std. dev.       Min        Max
+{hline 13}{c +}{hline 57}
+{space 9}zfd {c |}{res}     34,753    -.036375    .9378872  -1.864917   4.468295
+{txt}
+{com}. su zfd if Country=="Scottland"
+
+{txt}    Variable {c |}        Obs        Mean    Std. dev.       Min        Max
+{hline 13}{c +}{hline 57}
+{space 9}zfd {c |}{res}      6,976    .1812126    1.249169   -1.88724     5.0284
+{txt}
+{com}. 
+. bysort zfd_cluster: su zfd 
+
+{txt}{hline}
+-> zfd_cluster = 1
+
+    Variable {c |}        Obs        Mean    Std. dev.       Min        Max
+{hline 13}{c +}{hline 57}
+{space 9}zfd {c |}{res}     10,433   -1.090481    .2752752   -1.88724  -.7080176
+
+{txt}{hline}
+-> zfd_cluster = 2
+
+    Variable {c |}        Obs        Mean    Std. dev.       Min        Max
+{hline 13}{c +}{hline 57}
+{space 9}zfd {c |}{res}     10,432   -.4421362    .1519466  -.7079576  -.1738902
+
+{txt}{hline}
+-> zfd_cluster = 3
+
+    Variable {c |}        Obs        Mean    Std. dev.       Min        Max
+{hline 13}{c +}{hline 57}
+{space 9}zfd {c |}{res}     10,432    .1494547    .2072565  -.1738611   .5510217
+
+{txt}{hline}
+-> zfd_cluster = 4
+
+    Variable {c |}        Obs        Mean    Std. dev.       Min        Max
+{hline 13}{c +}{hline 57}
+{space 9}zfd {c |}{res}     10,432    1.383267    .7332989   .5510371     5.0284
+
+{txt}{hline}
+-> zfd_cluster = .
+
+    Variable {c |}        Obs        Mean    Std. dev.       Min        Max
+{hline 13}{c +}{hline 57}
+{space 9}zfd {c |}{res}          0
+
+{txt}
+{com}. bysort zfd_cluster: su zfd if Country=="England and Wales"
+
+{txt}{hline}
+-> zfd_cluster = 1
+
+    Variable {c |}        Obs        Mean    Std. dev.       Min        Max
+{hline 13}{c +}{hline 57}
+{space 9}zfd {c |}{res}      8,697   -1.068774    .2569753  -1.864917  -.7080176
+
+{txt}{hline}
+-> zfd_cluster = 2
+
+    Variable {c |}        Obs        Mean    Std. dev.       Min        Max
+{hline 13}{c +}{hline 57}
+{space 9}zfd {c |}{res}      9,001   -.4414727    .1516269  -.7079576  -.1738902
+
+{txt}{hline}
+-> zfd_cluster = 3
+
+    Variable {c |}        Obs        Mean    Std. dev.       Min        Max
+{hline 13}{c +}{hline 57}
+{space 9}zfd {c |}{res}      8,982    .1454867    .2058765  -.1738611   .5510217
+
+{txt}{hline}
+-> zfd_cluster = 4
+
+    Variable {c |}        Obs        Mean    Std. dev.       Min        Max
+{hline 13}{c +}{hline 57}
+{space 9}zfd {c |}{res}      8,073    1.325148     .648818   .5510371   4.468295
+
+{txt}{hline}
+-> zfd_cluster = .
+
+    Variable {c |}        Obs        Mean    Std. dev.       Min        Max
+{hline 13}{c +}{hline 57}
+{space 9}zfd {c |}{res}          0
+
+{txt}
+{com}. bysort zfd_cluster: su zfd if Country=="Scottland"
+
+{txt}{hline}
+-> zfd_cluster = 1
+
+    Variable {c |}        Obs        Mean    Std. dev.       Min        Max
+{hline 13}{c +}{hline 57}
+{space 9}zfd {c |}{res}      1,736   -1.199229    .3323308   -1.88724   -.709317
+
+{txt}{hline}
+-> zfd_cluster = 2
+
+    Variable {c |}        Obs        Mean    Std. dev.       Min        Max
+{hline 13}{c +}{hline 57}
+{space 9}zfd {c |}{res}      1,431   -.4463096    .1539301  -.7074839  -.1741566
+
+{txt}{hline}
+-> zfd_cluster = 3
+
+    Variable {c |}        Obs        Mean    Std. dev.       Min        Max
+{hline 13}{c +}{hline 57}
+{space 9}zfd {c |}{res}      1,450    .1740341    .2140475  -.1737192   .5508543
+
+{txt}{hline}
+-> zfd_cluster = 4
+
+    Variable {c |}        Obs        Mean    Std. dev.       Min        Max
+{hline 13}{c +}{hline 57}
+{space 9}zfd {c |}{res}      2,359    1.582162    .9415525   .5510725     5.0284
+
+{txt}{hline}
+-> zfd_cluster = .
+
+    Variable {c |}        Obs        Mean    Std. dev.       Min        Max
+{hline 13}{c +}{hline 57}
+{space 9}zfd {c |}{res}          0
+
+{txt}
+{com}. 
+. 
+. *******IMD**************
+. 
+. su soa_pct
+
+{txt}    Variable {c |}        Obs        Mean    Std. dev.       Min        Max
+{hline 13}{c +}{hline 57}
+{space 5}soa_pct {c |}{res}     41,729    50.00359    28.87063          0        100
+{txt}
+{com}. su soa_pct if Country=="England and Wales"
+
+{txt}    Variable {c |}        Obs        Mean    Std. dev.       Min        Max
+{hline 13}{c +}{hline 57}
+{space 5}soa_pct {c |}{res}     34,753    50.00288     28.8707          0        100
+{txt}
+{com}. su soa_pct if Country=="Scottland"
+
+{txt}    Variable {c |}        Obs        Mean    Std. dev.       Min        Max
+{hline 13}{c +}{hline 57}
+{space 5}soa_pct {c |}{res}      6,976    50.00717    28.87231          0        100
+{txt}
+{com}. 
+. su zsoa_pctinv
+
+{txt}    Variable {c |}        Obs        Mean    Std. dev.       Min        Max
+{hline 13}{c +}{hline 57}
+{space 1}zsoa_pctinv {c |}{res}     41,729     .000038     .999999    -1.7317   1.732025
+{txt}
+{com}. su zsoa_pctinv if Country=="England and Wales"
+
+{txt}    Variable {c |}        Obs        Mean    Std. dev.       Min        Max
+{hline 13}{c +}{hline 57}
+{space 1}zsoa_pctinv {c |}{res}     34,753    .0000629    1.000002    -1.7317   1.732025
+{txt}
+{com}. su zsoa_pctinv if Country=="Scottland"
+
+{txt}    Variable {c |}        Obs        Mean    Std. dev.       Min        Max
+{hline 13}{c +}{hline 57}
+{space 1}zsoa_pctinv {c |}{res}      6,976   -.0000857    1.000057    -1.7317   1.732025
+{txt}
+{com}. 
+. bysort zsoa_pctinv_cluster: su zsoa_pctinv 
+
+{txt}{hline}
+-> zsoa_pctinv_cluster = 1
+
+    Variable {c |}        Obs        Mean    Std. dev.       Min        Max
+{hline 13}{c +}{hline 57}
+{space 1}zsoa_pctinv {c |}{res}     10,642   -1.290321    .2551008    -1.7317  -.8657686
+
+{txt}{hline}
+-> zsoa_pctinv_cluster = 2
+
+    Variable {c |}        Obs        Mean    Std. dev.       Min        Max
+{hline 13}{c +}{hline 57}
+{space 1}zsoa_pctinv {c |}{res}     10,433   -.4154811    .2498001  -.8311313   .0001625
+
+{txt}{hline}
+-> zsoa_pctinv_cluster = 3
+
+    Variable {c |}        Obs        Mean    Std. dev.       Min        Max
+{hline 13}{c +}{hline 57}
+{space 1}zsoa_pctinv {c |}{res}     10,432      .45046    .2497755   .0347998   .8660937
+
+{txt}{hline}
+-> zsoa_pctinv_cluster = 4
+
+    Variable {c |}        Obs        Mean    Std. dev.       Min        Max
+{hline 13}{c +}{hline 57}
+{space 1}zsoa_pctinv {c |}{res}     10,222    1.307835     .245039   .9007309   1.732025
+
+{txt}{hline}
+-> zsoa_pctinv_cluster = .
+
+    Variable {c |}        Obs        Mean    Std. dev.       Min        Max
+{hline 13}{c +}{hline 57}
+{space 1}zsoa_pctinv {c |}{res}          0
+
+{txt}
+{com}. bysort zsoa_pctinv_cluster: su zsoa_pctinv if Country=="England and Wales"
+
+{txt}{hline}
+-> zsoa_pctinv_cluster = 1
+
+    Variable {c |}        Obs        Mean    Std. dev.       Min        Max
+{hline 13}{c +}{hline 57}
+{space 1}zsoa_pctinv {c |}{res}      8,863   -1.290291    .2551096    -1.7317  -.8657686
+
+{txt}{hline}
+-> zsoa_pctinv_cluster = 2
+
+    Variable {c |}        Obs        Mean    Std. dev.       Min        Max
+{hline 13}{c +}{hline 57}
+{space 1}zsoa_pctinv {c |}{res}      8,689   -.4154445    .2498109  -.8311313   .0001625
+
+{txt}{hline}
+-> zsoa_pctinv_cluster = 3
+
+    Variable {c |}        Obs        Mean    Std. dev.       Min        Max
+{hline 13}{c +}{hline 57}
+{space 1}zsoa_pctinv {c |}{res}      8,688    .4505025     .249781   .0347998   .8660937
+
+{txt}{hline}
+-> zsoa_pctinv_cluster = 4
+
+    Variable {c |}        Obs        Mean    Std. dev.       Min        Max
+{hline 13}{c +}{hline 57}
+{space 1}zsoa_pctinv {c |}{res}      8,513    1.307866     .245042   .9007309   1.732025
+
+{txt}{hline}
+-> zsoa_pctinv_cluster = .
+
+    Variable {c |}        Obs        Mean    Std. dev.       Min        Max
+{hline 13}{c +}{hline 57}
+{space 1}zsoa_pctinv {c |}{res}          0
+
+{txt}
+{com}. bysort zsoa_pctinv_cluster: su zsoa_pctinv if Country=="Scottland"
+
+{txt}{hline}
+-> zsoa_pctinv_cluster = 1
+
+    Variable {c |}        Obs        Mean    Std. dev.       Min        Max
+{hline 13}{c +}{hline 57}
+{space 1}zsoa_pctinv {c |}{res}      1,779   -1.290469    .2551284    -1.7317  -.8657686
+
+{txt}{hline}
+-> zsoa_pctinv_cluster = 2
+
+    Variable {c |}        Obs        Mean    Std. dev.       Min        Max
+{hline 13}{c +}{hline 57}
+{space 1}zsoa_pctinv {c |}{res}      1,744   -.4156631    .2498181  -.8311313   .0001625
+
+{txt}{hline}
+-> zsoa_pctinv_cluster = 3
+
+    Variable {c |}        Obs        Mean    Std. dev.       Min        Max
+{hline 13}{c +}{hline 57}
+{space 1}zsoa_pctinv {c |}{res}      1,744    .4502481    .2498195   .0347998   .8660937
+
+{txt}{hline}
+-> zsoa_pctinv_cluster = 4
+
+    Variable {c |}        Obs        Mean    Std. dev.       Min        Max
+{hline 13}{c +}{hline 57}
+{space 1}zsoa_pctinv {c |}{res}      1,709    1.307683    .2450962   .9007309   1.732025
+
+{txt}{hline}
+-> zsoa_pctinv_cluster = .
+
+    Variable {c |}        Obs        Mean    Std. dev.       Min        Max
+{hline 13}{c +}{hline 57}
+{space 1}zsoa_pctinv {c |}{res}          0
+
+{txt}
+{com}. 
+. ******Clustering of IMD and Food desert index**************
+. 
+. tab cluster_soa_pctinvfd
+
+{txt}cluster_soa_pct {c |}
+          invfd {c |}      Freq.     Percent        Cum.
+{hline 16}{c +}{hline 35}
+      High-High {c |}{res}     13,276       31.81       31.81
+{txt}        Low-Low {c |}{res}     13,487       32.32       64.14
+{txt}     Mixed High {c |}{res}      7,378       17.68       81.82
+{txt}      Mixed Low {c |}{res}      7,588       18.18      100.00
+{txt}{hline 16}{c +}{hline 35}
+          Total {c |}{res}     41,729      100.00
+{txt}
+{com}. tab cluster_soa_pctinvfd if Country=="England and Wales"
+
+{txt}cluster_soa_pct {c |}
+          invfd {c |}      Freq.     Percent        Cum.
+{hline 16}{c +}{hline 35}
+      High-High {c |}{res}     10,781       31.02       31.02
+{txt}        Low-Low {c |}{res}     11,278       32.45       63.47
+{txt}     Mixed High {c |}{res}      6,420       18.47       81.95
+{txt}      Mixed Low {c |}{res}      6,274       18.05      100.00
+{txt}{hline 16}{c +}{hline 35}
+          Total {c |}{res}     34,753      100.00
+{txt}
+{com}. tab cluster_soa_pctinvfd if Country=="Scottland"
+
+{txt}cluster_soa_pct {c |}
+          invfd {c |}      Freq.     Percent        Cum.
+{hline 16}{c +}{hline 35}
+      High-High {c |}{res}      2,495       35.77       35.77
+{txt}        Low-Low {c |}{res}      2,209       31.67       67.43
+{txt}     Mixed High {c |}{res}        958       13.73       81.16
+{txt}      Mixed Low {c |}{res}      1,314       18.84      100.00
+{txt}{hline 16}{c +}{hline 35}
+          Total {c |}{res}      6,976      100.00
+{txt}
+{com}. 
+. save UK_fooddesertdatafinalizedIMD_merged, replace
+{txt}{p 0 4 2}
+file {bf}
+UK_fooddesertdatafinalizedIMD_merged.dta{rm}
+saved
+{p_end}
+
+{com}. 
+. capture log close
+{smcl}
+{com}{sf}{ul off}

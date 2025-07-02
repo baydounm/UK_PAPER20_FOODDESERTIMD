@@ -1,0 +1,1625 @@
+{smcl}
+{com}{sf}{ul off}{txt}
+{com}. 
+. 
+. **Food desert data**
+. **https://data.cdrc.ac.uk/dataset/e-food-desert-index**
+. 
+. **Index of multiple deprivation-imd**
+. **https://data.cdrc.ac.uk/dataset/index-multiple-deprivation-imd**
+. 
+. **Shapefile: Great Britain 2011**
+. **https://statistics.ukdataservice.ac.uk/dataset/2011-census-geography-boundaries-lower-layer-super-output-areas-and-data-zones?utm_source=chatgpt.com**
+. *-----------------------------*
+. * Step 0: Set working directory
+. *-----------------------------*
+. cd "E:\16GBBACKUPUSB\BACKUP_USB_SEPTEMBER2014\May Baydoun_folder\UK_BIOBANK_PROJECT\UKB_PAPER20_ADI_FOODESERT\DATA"
+{res}E:\16GBBACKUPUSB\BACKUP_USB_SEPTEMBER2014\May Baydoun_folder\UK_BIOBANK_PROJECT\UKB_PAPER20_ADI_FOODESERT\DATA
+{txt}
+{com}. 
+. *-----------------------------*
+. * Step 1: Load Food Desert Data
+. *-----------------------------*
+. use UK_fooddesertdatafinalized, clear
+{txt}
+{com}. 
+. * Clean LSOA codes (ensure uppercase, no trailing spaces)
+. replace lsoa11 = upper(strtrim(lsoa11))
+{txt}(0 real changes made)
+
+{com}. 
+. * Save cleaned file
+. save UK_fooddesertdatafinalized_clean, replace
+{txt}{p 0 4 2}
+file {bf}
+UK_fooddesertdatafinalized_clean.dta{rm}
+saved
+{p_end}
+
+{com}. 
+. *-----------------------------*
+. * Step 2: Load IMD Data
+. *-----------------------------*
+. import delimited "Dataset1_CDRC_Harmonised_IMD2019.csv", clear
+{res}{txt}(encoding automatically selected: ISO-8859-1)
+{res}{text}(8 vars, 42,619 obs)
+
+{com}. 
+. * Create `lsoa11` variable for merging
+. gen lsoa11 = upper(strtrim(lsoa))  // Clean LSOA codes
+{txt}
+{com}. drop lsoa
+{txt}
+{com}. save IMD2019_clean, replace
+{txt}{p 0 4 2}
+file {bf}
+IMD2019_clean.dta{rm}
+saved
+{p_end}
+
+{com}. 
+. *-----------------------------*
+. * Step 3: Merge IMD with Food Desert Data
+. *-----------------------------*
+. use IMD2019_clean, clear
+{txt}
+{com}. merge 1:1 lsoa11 using UK_fooddesertdatafinalized_clean
+{res}
+{txt}{col 5}Result{col 33}Number of obs
+{col 5}{hline 41}
+{col 5}Not matched{col 30}{res}               3
+{txt}{col 9}from master{col 30}{res}               0{txt}  (_merge==1)
+{col 9}from using{col 30}{res}               3{txt}  (_merge==2)
+
+{col 5}Matched{col 30}{res}          42,619{txt}  (_merge==3)
+{col 5}{hline 41}
+
+{com}. 
+. * Keep matched data
+. keep if _merge == 3
+{txt}(3 observations deleted)
+
+{com}. drop _merge
+{txt}
+{com}. 
+. *-----------------------------*
+. * Step 4: Standardize and Transform Scores
+. *-----------------------------*
+. egen zfd = std(fd)
+{txt}(890 missing values generated)
+
+{com}. egen zsoa_pct = std(soa_pct)
+{txt}
+{com}. gen zsoa_pctinv = -1 * zsoa_pct   // Invert so high = worse for deprivation
+{txt}
+{com}. 
+. keep if zfd~=. & zsoa_pctinv~=. 
+{txt}(890 observations deleted)
+
+{com}. 
+. 
+. save UK_fooddesertdatafinalizedIMD, replace
+{txt}{p 0 4 2}
+file {bf}
+UK_fooddesertdatafinalizedIMD.dta{rm}
+saved
+{p_end}
+
+{com}. 
+. su zfd zsoa_pctinv
+
+{txt}    Variable {c |}        Obs        Mean    Std. dev.       Min        Max
+{hline 13}{c +}{hline 57}
+{space 9}zfd {c |}{res}     41,729    2.58e-10           1   -1.88724     5.0284
+{txt}{space 1}zsoa_pctinv {c |}{res}     41,729     .000038     .999999    -1.7317   1.732025
+{txt}
+{com}. 
+. histogram zfd
+{txt}(bin={res}46{txt}, start={res}-1.8872401{txt}, width={res}.15034001{txt})
+{res}{txt}
+{com}. histogram zsoa_pctinv
+{txt}(bin={res}46{txt}, start={res}-1.7316997{txt}, width={res}.07529836{txt})
+{res}{txt}
+{com}. 
+. 
+. save UK_fooddesertdatafinalizedIMD, replace
+{txt}{p 0 4 2}
+file {bf}
+UK_fooddesertdatafinalizedIMD.dta{rm}
+saved
+{p_end}
+
+{com}. 
+. 
+. *-----------------------------*
+. * Step 5: Create Cluster Categories
+. *-----------------------------*
+. xtile zsoa_pctinv_cluster = zsoa_pctinv, nq(4)
+{txt}
+{com}. xtile zfd_cluster = zfd, nq(4)
+{txt}
+{com}. 
+. gen cluster_soa_pctinvfd = .
+{txt}(41,729 missing values generated)
+
+{com}. replace cluster_soa_pctinvfd = 1 if zsoa_pctinv_cluster >= 3 & zfd_cluster >= 3  &  zsoa_pctinv_cluster~=. &  zfd_cluster~=. // High-High
+{txt}(13,276 real changes made)
+
+{com}. replace cluster_soa_pctinvfd = 2 if zsoa_pctinv_cluster <= 2 & zfd_cluster <= 2  &  zsoa_pctinv_cluster~=. &  zfd_cluster~=.   // Low-Low
+{txt}(13,487 real changes made)
+
+{com}. replace cluster_soa_pctinvfd = 3 if zsoa_pctinv_cluster > 2 & zfd_cluster <= 2   &  zsoa_pctinv_cluster~=. &  zfd_cluster~=.   // Mixed High
+{txt}(7,378 real changes made)
+
+{com}. replace cluster_soa_pctinvfd = 4 if zsoa_pctinv_cluster <= 2 & zfd_cluster > 2   &  zsoa_pctinv_cluster~=. &  zfd_cluster~=.   // Mixed Low
+{txt}(7,588 real changes made)
+
+{com}. replace cluster_soa_pctinvfd = 0 if missing(cluster_soa_pctinvfd)                   // Non-significant
+{txt}(0 real changes made)
+
+{com}. 
+. tab cluster_soa_pctinvfd
+
+{txt}cluster_soa {c |}
+  _pctinvfd {c |}      Freq.     Percent        Cum.
+{hline 12}{c +}{hline 35}
+          1 {c |}{res}     13,276       31.81       31.81
+{txt}          2 {c |}{res}     13,487       32.32       64.14
+{txt}          3 {c |}{res}      7,378       17.68       81.82
+{txt}          4 {c |}{res}      7,588       18.18      100.00
+{txt}{hline 12}{c +}{hline 35}
+      Total {c |}{res}     41,729      100.00
+{txt}
+{com}. 
+. label define cluster_soa_pctinvfd 0 "Non-significant" 1 "High-High" 2 "Low-Low" 3 "Mixed High" 4 "Mixed Low"
+{txt}
+{com}. label values cluster_soa_pctinvfd cluster_soa_pctinvfd
+{txt}
+{com}. 
+. tab cluster_soa_pctinvfd
+
+{txt}cluster_soa_pct {c |}
+          invfd {c |}      Freq.     Percent        Cum.
+{hline 16}{c +}{hline 35}
+      High-High {c |}{res}     13,276       31.81       31.81
+{txt}        Low-Low {c |}{res}     13,487       32.32       64.14
+{txt}     Mixed High {c |}{res}      7,378       17.68       81.82
+{txt}      Mixed Low {c |}{res}      7,588       18.18      100.00
+{txt}{hline 16}{c +}{hline 35}
+          Total {c |}{res}     41,729      100.00
+{txt}
+{com}. 
+. save UK_fooddesertdatafinalizedIMD, replace
+{txt}{p 0 4 2}
+file {bf}
+UK_fooddesertdatafinalizedIMD.dta{rm}
+saved
+{p_end}
+
+{com}. 
+. 
+. *-----------------------------*
+. * Step 6: Convert SHP to Stata format (if not already done)
+. *-----------------------------*
+. * This step requires that infuse_gb_2011_clipped.shp and associated .dbf and .shx files are present in this directory
+. 
+. shp2dta using infuse_lsoa_lyr_2011_clipped.shp, database(uk_db) coordinates(uk_coords) replace
+{res}type: 5
+{txt}
+{com}. 
+. 
+. *-----------------------------*
+. * Step 7: Prepare shapefile attribute data for merging
+. *-----------------------------*
+. * Load the attribute data
+. use uk_db, clear
+{txt}
+{com}. 
+. * Rename and clean LSOA code
+. rename geo_code lsoa11
+{res}{txt}
+{com}. replace lsoa11 = upper(strtrim(lsoa11))
+{txt}(0 real changes made)
+
+{com}. 
+. save uk_db_str, replace
+{txt}{p 0 4 2}
+file {bf}
+uk_db_str.dta{rm}
+saved
+{p_end}
+
+{com}. 
+. *-----------------------------*
+. * Step 8: Merge cluster data with shapefile data
+. *-----------------------------*
+. 
+. use UK_fooddesertdatafinalizedIMD, clear
+{txt}
+{com}. replace lsoa11 = upper(strtrim(lsoa11))
+{txt}(0 real changes made)
+
+{com}. merge 1:1 lsoa11 using uk_db_str
+{res}
+{txt}{col 5}Result{col 33}Number of obs
+{col 5}{hline 41}
+{col 5}Not matched{col 30}{res}             890
+{txt}{col 9}from master{col 30}{res}               0{txt}  (_merge==1)
+{col 9}from using{col 30}{res}             890{txt}  (_merge==2)
+
+{col 5}Matched{col 30}{res}          41,729{txt}  (_merge==3)
+{col 5}{hline 41}
+
+{com}. tab _merge
+
+   {txt}Matching result from {c |}
+                  merge {c |}      Freq.     Percent        Cum.
+{hline 24}{c +}{hline 35}
+         Using only (2) {c |}{res}        890        2.09        2.09
+{txt}            Matched (3) {c |}{res}     41,729       97.91      100.00
+{txt}{hline 24}{c +}{hline 35}
+                  Total {c |}{res}     42,619      100.00
+{txt}
+{com}. 
+. 
+. *-----------------------------*
+. * Step 9: Check cluster distribution
+. *-----------------------------*
+. tab cluster_soa_pctinvfd, missing
+
+{txt}cluster_soa_pct {c |}
+          invfd {c |}      Freq.     Percent        Cum.
+{hline 16}{c +}{hline 35}
+      High-High {c |}{res}     13,276       31.15       31.15
+{txt}        Low-Low {c |}{res}     13,487       31.65       62.80
+{txt}     Mixed High {c |}{res}      7,378       17.31       80.11
+{txt}      Mixed Low {c |}{res}      7,588       17.80       97.91
+{txt}              . {c |}{res}        890        2.09      100.00
+{txt}{hline 16}{c +}{hline 35}
+          Total {c |}{res}     42,619      100.00
+{txt}
+{com}. 
+. *-----------------------------*
+. * Step 10: Map the Clusters!
+. *-----------------------------*
+. * Note: ID variable must be numeric, use _ID from shapefile
+. 
+. **0 "Non-significant" 1 "High-High" 2 "Low-Low" 3 "Mixed High" 4 "Mixed Low"
+. 
+. capture drop cluster_ordered
+{txt}
+{com}. gen cluster_ordered = .
+{txt}(42,619 missing values generated)
+
+{com}. replace cluster_ordered = 2 if cluster_soa_pctinvfd == 1   // High-High
+{txt}(13,276 real changes made)
+
+{com}. replace cluster_ordered = 0 if cluster_soa_pctinvfd == 2   // Low-Low
+{txt}(13,487 real changes made)
+
+{com}. replace cluster_ordered = 1 if cluster_soa_pctinvfd == 3   // Mixed-High
+{txt}(7,378 real changes made)
+
+{com}. replace cluster_ordered = 1 if cluster_soa_pctinvfd == 4   // Mixed-Low
+{txt}(7,588 real changes made)
+
+{com}. replace cluster_ordered = 1 if cluster_soa_pctinvfd == 0   // Mixed-Low
+{txt}(0 real changes made)
+
+{com}. 
+. 
+. list _ID if missing(cluster_ordered)
+{txt}
+       {c TLC}{hline 7}{c TRC}
+       {c |} {res}  _ID {txt}{c |}
+       {c LT}{hline 7}{c RT}
+41730. {c |} {res} 3540 {txt}{c |}
+41731. {c |} {res}20428 {txt}{c |}
+41732. {c |} {res}31560 {txt}{c |}
+41733. {c |} {res}12465 {txt}{c |}
+41734. {c |} {res}27411 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+41735. {c |} {res}13111 {txt}{c |}
+41736. {c |} {res}28497 {txt}{c |}
+41737. {c |} {res}14987 {txt}{c |}
+41738. {c |} {res}14454 {txt}{c |}
+41739. {c |} {res}19028 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+41740. {c |} {res} 2226 {txt}{c |}
+41741. {c |} {res}31486 {txt}{c |}
+41742. {c |} {res}27315 {txt}{c |}
+41743. {c |} {res}24288 {txt}{c |}
+41744. {c |} {res} 7290 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+41745. {c |} {res}18948 {txt}{c |}
+41746. {c |} {res}19102 {txt}{c |}
+41747. {c |} {res} 1979 {txt}{c |}
+41748. {c |} {res} 8745 {txt}{c |}
+41749. {c |} {res}25518 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+41750. {c |} {res} 4976 {txt}{c |}
+41751. {c |} {res} 5106 {txt}{c |}
+41752. {c |} {res} 1300 {txt}{c |}
+41753. {c |} {res}12604 {txt}{c |}
+41754. {c |} {res} 7123 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+41755. {c |} {res} 4974 {txt}{c |}
+41756. {c |} {res}27979 {txt}{c |}
+41757. {c |} {res} 2464 {txt}{c |}
+41758. {c |} {res}22562 {txt}{c |}
+41759. {c |} {res} 7805 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+41760. {c |} {res}18578 {txt}{c |}
+41761. {c |} {res} 6263 {txt}{c |}
+41762. {c |} {res}19368 {txt}{c |}
+41763. {c |} {res}13118 {txt}{c |}
+41764. {c |} {res}24883 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+41765. {c |} {res}34278 {txt}{c |}
+41766. {c |} {res}32251 {txt}{c |}
+41767. {c |} {res}12620 {txt}{c |}
+41768. {c |} {res}16809 {txt}{c |}
+41769. {c |} {res} 1186 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+41770. {c |} {res}25638 {txt}{c |}
+41771. {c |} {res}18680 {txt}{c |}
+41772. {c |} {res}20765 {txt}{c |}
+41773. {c |} {res}32850 {txt}{c |}
+41774. {c |} {res}11854 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+41775. {c |} {res}14938 {txt}{c |}
+41776. {c |} {res}10140 {txt}{c |}
+41777. {c |} {res}13761 {txt}{c |}
+41778. {c |} {res} 7675 {txt}{c |}
+41779. {c |} {res}30214 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+41780. {c |} {res}20356 {txt}{c |}
+41781. {c |} {res}28715 {txt}{c |}
+41782. {c |} {res}18975 {txt}{c |}
+41783. {c |} {res}13833 {txt}{c |}
+41784. {c |} {res}30838 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+41785. {c |} {res}24275 {txt}{c |}
+41786. {c |} {res} 9129 {txt}{c |}
+41787. {c |} {res}26138 {txt}{c |}
+41788. {c |} {res} 1780 {txt}{c |}
+41789. {c |} {res}29681 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+41790. {c |} {res}12078 {txt}{c |}
+41791. {c |} {res} 2387 {txt}{c |}
+41792. {c |} {res}16345 {txt}{c |}
+41793. {c |} {res}32381 {txt}{c |}
+41794. {c |} {res}34019 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+41795. {c |} {res}22840 {txt}{c |}
+41796. {c |} {res}17919 {txt}{c |}
+41797. {c |} {res}17975 {txt}{c |}
+41798. {c |} {res}26814 {txt}{c |}
+41799. {c |} {res} 8397 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+41800. {c |} {res}11926 {txt}{c |}
+41801. {c |} {res}25584 {txt}{c |}
+41802. {c |} {res}36779 {txt}{c |}
+41803. {c |} {res}26537 {txt}{c |}
+41804. {c |} {res}27081 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+41805. {c |} {res}15403 {txt}{c |}
+41806. {c |} {res}19109 {txt}{c |}
+41807. {c |} {res}10366 {txt}{c |}
+41808. {c |} {res}36114 {txt}{c |}
+41809. {c |} {res}30375 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+41810. {c |} {res} 9897 {txt}{c |}
+41811. {c |} {res}30950 {txt}{c |}
+41812. {c |} {res} 5203 {txt}{c |}
+41813. {c |} {res}19246 {txt}{c |}
+41814. {c |} {res}16905 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+41815. {c |} {res}25716 {txt}{c |}
+41816. {c |} {res} 2116 {txt}{c |}
+41817. {c |} {res}12545 {txt}{c |}
+41818. {c |} {res}10717 {txt}{c |}
+41819. {c |} {res}  949 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+41820. {c |} {res}17959 {txt}{c |}
+41821. {c |} {res}  313 {txt}{c |}
+41822. {c |} {res}33431 {txt}{c |}
+41823. {c |} {res}17345 {txt}{c |}
+41824. {c |} {res}29774 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+41825. {c |} {res}34931 {txt}{c |}
+41826. {c |} {res}23972 {txt}{c |}
+41827. {c |} {res} 3184 {txt}{c |}
+41828. {c |} {res}22057 {txt}{c |}
+41829. {c |} {res} 6570 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+41830. {c |} {res}31924 {txt}{c |}
+41831. {c |} {res}37653 {txt}{c |}
+41832. {c |} {res} 3297 {txt}{c |}
+41833. {c |} {res}16547 {txt}{c |}
+41834. {c |} {res} 6245 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+41835. {c |} {res} 9290 {txt}{c |}
+41836. {c |} {res}19112 {txt}{c |}
+41837. {c |} {res}14011 {txt}{c |}
+41838. {c |} {res}32462 {txt}{c |}
+41839. {c |} {res} 3461 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+41840. {c |} {res}25184 {txt}{c |}
+41841. {c |} {res}30909 {txt}{c |}
+41842. {c |} {res}14945 {txt}{c |}
+41843. {c |} {res}10626 {txt}{c |}
+41844. {c |} {res}28271 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+41845. {c |} {res}29883 {txt}{c |}
+41846. {c |} {res}18207 {txt}{c |}
+41847. {c |} {res}24629 {txt}{c |}
+41848. {c |} {res}23779 {txt}{c |}
+41849. {c |} {res}36766 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+41850. {c |} {res} 2698 {txt}{c |}
+41851. {c |} {res}  623 {txt}{c |}
+41852. {c |} {res}22461 {txt}{c |}
+41853. {c |} {res}13587 {txt}{c |}
+41854. {c |} {res}20899 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+41855. {c |} {res}20081 {txt}{c |}
+41856. {c |} {res}26659 {txt}{c |}
+41857. {c |} {res} 1992 {txt}{c |}
+41858. {c |} {res} 3920 {txt}{c |}
+41859. {c |} {res}15472 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+41860. {c |} {res}26931 {txt}{c |}
+41861. {c |} {res}36448 {txt}{c |}
+41862. {c |} {res}30466 {txt}{c |}
+41863. {c |} {res} 8319 {txt}{c |}
+41864. {c |} {res}32183 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+41865. {c |} {res}24326 {txt}{c |}
+41866. {c |} {res}25598 {txt}{c |}
+41867. {c |} {res}  549 {txt}{c |}
+41868. {c |} {res}29504 {txt}{c |}
+41869. {c |} {res} 2706 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+41870. {c |} {res}20036 {txt}{c |}
+41871. {c |} {res}31542 {txt}{c |}
+41872. {c |} {res} 8476 {txt}{c |}
+41873. {c |} {res}27804 {txt}{c |}
+41874. {c |} {res}19284 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+41875. {c |} {res}18521 {txt}{c |}
+41876. {c |} {res}13162 {txt}{c |}
+41877. {c |} {res}34045 {txt}{c |}
+41878. {c |} {res}21077 {txt}{c |}
+41879. {c |} {res}30434 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+41880. {c |} {res} 3375 {txt}{c |}
+41881. {c |} {res}36814 {txt}{c |}
+41882. {c |} {res}18236 {txt}{c |}
+41883. {c |} {res} 9582 {txt}{c |}
+41884. {c |} {res}26458 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+41885. {c |} {res} 6491 {txt}{c |}
+41886. {c |} {res}24732 {txt}{c |}
+41887. {c |} {res}33866 {txt}{c |}
+41888. {c |} {res} 2786 {txt}{c |}
+41889. {c |} {res} 3009 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+41890. {c |} {res} 3413 {txt}{c |}
+41891. {c |} {res}20085 {txt}{c |}
+41892. {c |} {res}34034 {txt}{c |}
+41893. {c |} {res}16229 {txt}{c |}
+41894. {c |} {res} 8462 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+41895. {c |} {res}13812 {txt}{c |}
+41896. {c |} {res}16803 {txt}{c |}
+41897. {c |} {res}22940 {txt}{c |}
+41898. {c |} {res}10351 {txt}{c |}
+41899. {c |} {res}14643 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+41900. {c |} {res} 2476 {txt}{c |}
+41901. {c |} {res}16982 {txt}{c |}
+41902. {c |} {res} 2264 {txt}{c |}
+41903. {c |} {res}33931 {txt}{c |}
+41904. {c |} {res}33791 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+41905. {c |} {res}11253 {txt}{c |}
+41906. {c |} {res}10942 {txt}{c |}
+41907. {c |} {res} 2850 {txt}{c |}
+41908. {c |} {res}24511 {txt}{c |}
+41909. {c |} {res}31820 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+41910. {c |} {res} 5469 {txt}{c |}
+41911. {c |} {res}26528 {txt}{c |}
+41912. {c |} {res}27658 {txt}{c |}
+41913. {c |} {res}  466 {txt}{c |}
+41914. {c |} {res}25449 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+41915. {c |} {res}28197 {txt}{c |}
+41916. {c |} {res}31066 {txt}{c |}
+41917. {c |} {res}16516 {txt}{c |}
+41918. {c |} {res}34971 {txt}{c |}
+41919. {c |} {res}33476 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+41920. {c |} {res} 8709 {txt}{c |}
+41921. {c |} {res}12321 {txt}{c |}
+41922. {c |} {res} 9640 {txt}{c |}
+41923. {c |} {res}19713 {txt}{c |}
+41924. {c |} {res}14770 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+41925. {c |} {res}33995 {txt}{c |}
+41926. {c |} {res}24120 {txt}{c |}
+41927. {c |} {res}16917 {txt}{c |}
+41928. {c |} {res}27452 {txt}{c |}
+41929. {c |} {res} 7631 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+41930. {c |} {res}23100 {txt}{c |}
+41931. {c |} {res}17935 {txt}{c |}
+41932. {c |} {res}10967 {txt}{c |}
+41933. {c |} {res}35599 {txt}{c |}
+41934. {c |} {res}10634 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+41935. {c |} {res}12950 {txt}{c |}
+41936. {c |} {res}10225 {txt}{c |}
+41937. {c |} {res} 4307 {txt}{c |}
+41938. {c |} {res}26019 {txt}{c |}
+41939. {c |} {res}17143 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+41940. {c |} {res}21073 {txt}{c |}
+41941. {c |} {res}19027 {txt}{c |}
+41942. {c |} {res}12457 {txt}{c |}
+41943. {c |} {res}29128 {txt}{c |}
+41944. {c |} {res}28925 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+41945. {c |} {res}37411 {txt}{c |}
+41946. {c |} {res}27503 {txt}{c |}
+41947. {c |} {res} 9354 {txt}{c |}
+41948. {c |} {res} 4773 {txt}{c |}
+41949. {c |} {res}31169 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+41950. {c |} {res}24821 {txt}{c |}
+41951. {c |} {res}11837 {txt}{c |}
+41952. {c |} {res}20446 {txt}{c |}
+41953. {c |} {res}29515 {txt}{c |}
+41954. {c |} {res}11640 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+41955. {c |} {res}26468 {txt}{c |}
+41956. {c |} {res} 8270 {txt}{c |}
+41957. {c |} {res}15503 {txt}{c |}
+41958. {c |} {res} 5339 {txt}{c |}
+41959. {c |} {res}30755 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+41960. {c |} {res}13312 {txt}{c |}
+41961. {c |} {res} 3033 {txt}{c |}
+41962. {c |} {res}34920 {txt}{c |}
+41963. {c |} {res}30459 {txt}{c |}
+41964. {c |} {res}23085 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+41965. {c |} {res}19000 {txt}{c |}
+41966. {c |} {res}15652 {txt}{c |}
+41967. {c |} {res}14343 {txt}{c |}
+41968. {c |} {res} 6279 {txt}{c |}
+41969. {c |} {res}37635 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+41970. {c |} {res}23269 {txt}{c |}
+41971. {c |} {res}11216 {txt}{c |}
+41972. {c |} {res}10111 {txt}{c |}
+41973. {c |} {res}11228 {txt}{c |}
+41974. {c |} {res}13220 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+41975. {c |} {res} 8736 {txt}{c |}
+41976. {c |} {res}32301 {txt}{c |}
+41977. {c |} {res} 3954 {txt}{c |}
+41978. {c |} {res}28295 {txt}{c |}
+41979. {c |} {res} 5867 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+41980. {c |} {res}18213 {txt}{c |}
+41981. {c |} {res} 3511 {txt}{c |}
+41982. {c |} {res}33852 {txt}{c |}
+41983. {c |} {res}34290 {txt}{c |}
+41984. {c |} {res}11753 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+41985. {c |} {res}19237 {txt}{c |}
+41986. {c |} {res}10054 {txt}{c |}
+41987. {c |} {res} 4657 {txt}{c |}
+41988. {c |} {res}35735 {txt}{c |}
+41989. {c |} {res}16367 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+41990. {c |} {res}25503 {txt}{c |}
+41991. {c |} {res}23968 {txt}{c |}
+41992. {c |} {res} 7159 {txt}{c |}
+41993. {c |} {res}28771 {txt}{c |}
+41994. {c |} {res} 6855 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+41995. {c |} {res}32962 {txt}{c |}
+41996. {c |} {res}18401 {txt}{c |}
+41997. {c |} {res}26423 {txt}{c |}
+41998. {c |} {res}14515 {txt}{c |}
+41999. {c |} {res}28945 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42000. {c |} {res}33863 {txt}{c |}
+42001. {c |} {res} 4328 {txt}{c |}
+42002. {c |} {res} 6084 {txt}{c |}
+42003. {c |} {res}26767 {txt}{c |}
+42004. {c |} {res} 8493 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42005. {c |} {res}18807 {txt}{c |}
+42006. {c |} {res}15615 {txt}{c |}
+42007. {c |} {res}28192 {txt}{c |}
+42008. {c |} {res}14546 {txt}{c |}
+42009. {c |} {res}17759 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42010. {c |} {res}25477 {txt}{c |}
+42011. {c |} {res} 1542 {txt}{c |}
+42012. {c |} {res}36158 {txt}{c |}
+42013. {c |} {res}10988 {txt}{c |}
+42014. {c |} {res}19755 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42015. {c |} {res}35025 {txt}{c |}
+42016. {c |} {res} 6982 {txt}{c |}
+42017. {c |} {res}16106 {txt}{c |}
+42018. {c |} {res} 3370 {txt}{c |}
+42019. {c |} {res}25745 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42020. {c |} {res}  561 {txt}{c |}
+42021. {c |} {res} 2844 {txt}{c |}
+42022. {c |} {res}30020 {txt}{c |}
+42023. {c |} {res}14357 {txt}{c |}
+42024. {c |} {res} 6415 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42025. {c |} {res}10933 {txt}{c |}
+42026. {c |} {res}25535 {txt}{c |}
+42027. {c |} {res}35342 {txt}{c |}
+42028. {c |} {res}28209 {txt}{c |}
+42029. {c |} {res}26662 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42030. {c |} {res} 7801 {txt}{c |}
+42031. {c |} {res}36014 {txt}{c |}
+42032. {c |} {res}25484 {txt}{c |}
+42033. {c |} {res}23152 {txt}{c |}
+42034. {c |} {res}22009 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42035. {c |} {res}22638 {txt}{c |}
+42036. {c |} {res}27537 {txt}{c |}
+42037. {c |} {res}22110 {txt}{c |}
+42038. {c |} {res}16375 {txt}{c |}
+42039. {c |} {res} 3922 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42040. {c |} {res}19380 {txt}{c |}
+42041. {c |} {res}25271 {txt}{c |}
+42042. {c |} {res} 8653 {txt}{c |}
+42043. {c |} {res}15499 {txt}{c |}
+42044. {c |} {res}22902 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42045. {c |} {res}21710 {txt}{c |}
+42046. {c |} {res}24908 {txt}{c |}
+42047. {c |} {res}22977 {txt}{c |}
+42048. {c |} {res}24856 {txt}{c |}
+42049. {c |} {res}26925 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42050. {c |} {res}37392 {txt}{c |}
+42051. {c |} {res}32509 {txt}{c |}
+42052. {c |} {res}16437 {txt}{c |}
+42053. {c |} {res}29214 {txt}{c |}
+42054. {c |} {res} 1273 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42055. {c |} {res}24232 {txt}{c |}
+42056. {c |} {res}28409 {txt}{c |}
+42057. {c |} {res} 5756 {txt}{c |}
+42058. {c |} {res}19870 {txt}{c |}
+42059. {c |} {res}27880 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42060. {c |} {res}16182 {txt}{c |}
+42061. {c |} {res}26043 {txt}{c |}
+42062. {c |} {res}24530 {txt}{c |}
+42063. {c |} {res}12982 {txt}{c |}
+42064. {c |} {res}10412 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42065. {c |} {res} 7758 {txt}{c |}
+42066. {c |} {res}11615 {txt}{c |}
+42067. {c |} {res} 4152 {txt}{c |}
+42068. {c |} {res} 4777 {txt}{c |}
+42069. {c |} {res}32392 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42070. {c |} {res}10544 {txt}{c |}
+42071. {c |} {res} 9895 {txt}{c |}
+42072. {c |} {res}25888 {txt}{c |}
+42073. {c |} {res}29532 {txt}{c |}
+42074. {c |} {res}19348 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42075. {c |} {res} 4943 {txt}{c |}
+42076. {c |} {res} 2905 {txt}{c |}
+42077. {c |} {res}31939 {txt}{c |}
+42078. {c |} {res}21600 {txt}{c |}
+42079. {c |} {res}34780 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42080. {c |} {res}10348 {txt}{c |}
+42081. {c |} {res}22544 {txt}{c |}
+42082. {c |} {res} 9200 {txt}{c |}
+42083. {c |} {res}25723 {txt}{c |}
+42084. {c |} {res}29252 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42085. {c |} {res}13369 {txt}{c |}
+42086. {c |} {res}30850 {txt}{c |}
+42087. {c |} {res}21176 {txt}{c |}
+42088. {c |} {res}34425 {txt}{c |}
+42089. {c |} {res} 7790 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42090. {c |} {res}28502 {txt}{c |}
+42091. {c |} {res}12301 {txt}{c |}
+42092. {c |} {res}27981 {txt}{c |}
+42093. {c |} {res} 2895 {txt}{c |}
+42094. {c |} {res} 5942 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42095. {c |} {res} 9617 {txt}{c |}
+42096. {c |} {res}20743 {txt}{c |}
+42097. {c |} {res}35561 {txt}{c |}
+42098. {c |} {res}11787 {txt}{c |}
+42099. {c |} {res} 7391 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42100. {c |} {res}28881 {txt}{c |}
+42101. {c |} {res}34957 {txt}{c |}
+42102. {c |} {res}15768 {txt}{c |}
+42103. {c |} {res} 2238 {txt}{c |}
+42104. {c |} {res}26616 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42105. {c |} {res}33602 {txt}{c |}
+42106. {c |} {res}13223 {txt}{c |}
+42107. {c |} {res}36817 {txt}{c |}
+42108. {c |} {res} 6255 {txt}{c |}
+42109. {c |} {res}25272 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42110. {c |} {res}32842 {txt}{c |}
+42111. {c |} {res}16883 {txt}{c |}
+42112. {c |} {res}27106 {txt}{c |}
+42113. {c |} {res}18670 {txt}{c |}
+42114. {c |} {res}27043 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42115. {c |} {res} 7388 {txt}{c |}
+42116. {c |} {res} 2823 {txt}{c |}
+42117. {c |} {res}37645 {txt}{c |}
+42118. {c |} {res} 6873 {txt}{c |}
+42119. {c |} {res}17504 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42120. {c |} {res}27773 {txt}{c |}
+42121. {c |} {res}31114 {txt}{c |}
+42122. {c |} {res}27356 {txt}{c |}
+42123. {c |} {res} 9614 {txt}{c |}
+42124. {c |} {res} 7554 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42125. {c |} {res}18820 {txt}{c |}
+42126. {c |} {res}37390 {txt}{c |}
+42127. {c |} {res}12787 {txt}{c |}
+42128. {c |} {res}18877 {txt}{c |}
+42129. {c |} {res}12044 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42130. {c |} {res}27240 {txt}{c |}
+42131. {c |} {res} 7808 {txt}{c |}
+42132. {c |} {res} 2985 {txt}{c |}
+42133. {c |} {res} 1228 {txt}{c |}
+42134. {c |} {res} 2381 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42135. {c |} {res}12021 {txt}{c |}
+42136. {c |} {res}22701 {txt}{c |}
+42137. {c |} {res}35108 {txt}{c |}
+42138. {c |} {res}23411 {txt}{c |}
+42139. {c |} {res} 5035 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42140. {c |} {res}26068 {txt}{c |}
+42141. {c |} {res}14366 {txt}{c |}
+42142. {c |} {res}25562 {txt}{c |}
+42143. {c |} {res}32969 {txt}{c |}
+42144. {c |} {res}17782 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42145. {c |} {res}25948 {txt}{c |}
+42146. {c |} {res}16420 {txt}{c |}
+42147. {c |} {res}10380 {txt}{c |}
+42148. {c |} {res} 7079 {txt}{c |}
+42149. {c |} {res}10642 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42150. {c |} {res}20213 {txt}{c |}
+42151. {c |} {res}16020 {txt}{c |}
+42152. {c |} {res}20002 {txt}{c |}
+42153. {c |} {res}18638 {txt}{c |}
+42154. {c |} {res}23676 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42155. {c |} {res}10913 {txt}{c |}
+42156. {c |} {res}28642 {txt}{c |}
+42157. {c |} {res} 8523 {txt}{c |}
+42158. {c |} {res} 7118 {txt}{c |}
+42159. {c |} {res}11839 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42160. {c |} {res}20369 {txt}{c |}
+42161. {c |} {res}10007 {txt}{c |}
+42162. {c |} {res}25989 {txt}{c |}
+42163. {c |} {res}28531 {txt}{c |}
+42164. {c |} {res}  764 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42165. {c |} {res}36893 {txt}{c |}
+42166. {c |} {res} 8238 {txt}{c |}
+42167. {c |} {res}12725 {txt}{c |}
+42168. {c |} {res}22781 {txt}{c |}
+42169. {c |} {res} 9531 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42170. {c |} {res}31921 {txt}{c |}
+42171. {c |} {res}11262 {txt}{c |}
+42172. {c |} {res}18500 {txt}{c |}
+42173. {c |} {res}23497 {txt}{c |}
+42174. {c |} {res}26050 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42175. {c |} {res} 1824 {txt}{c |}
+42176. {c |} {res}13486 {txt}{c |}
+42177. {c |} {res}29308 {txt}{c |}
+42178. {c |} {res} 8703 {txt}{c |}
+42179. {c |} {res}20186 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42180. {c |} {res}19210 {txt}{c |}
+42181. {c |} {res}32296 {txt}{c |}
+42182. {c |} {res}18336 {txt}{c |}
+42183. {c |} {res}28720 {txt}{c |}
+42184. {c |} {res}22459 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42185. {c |} {res}24282 {txt}{c |}
+42186. {c |} {res}28814 {txt}{c |}
+42187. {c |} {res}27316 {txt}{c |}
+42188. {c |} {res} 6066 {txt}{c |}
+42189. {c |} {res}30887 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42190. {c |} {res} 3207 {txt}{c |}
+42191. {c |} {res}28962 {txt}{c |}
+42192. {c |} {res}16459 {txt}{c |}
+42193. {c |} {res}11235 {txt}{c |}
+42194. {c |} {res}33669 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42195. {c |} {res}23418 {txt}{c |}
+42196. {c |} {res}29165 {txt}{c |}
+42197. {c |} {res}34213 {txt}{c |}
+42198. {c |} {res}11298 {txt}{c |}
+42199. {c |} {res} 9159 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42200. {c |} {res}18457 {txt}{c |}
+42201. {c |} {res} 4646 {txt}{c |}
+42202. {c |} {res}29446 {txt}{c |}
+42203. {c |} {res}16627 {txt}{c |}
+42204. {c |} {res}30330 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42205. {c |} {res} 1059 {txt}{c |}
+42206. {c |} {res}28731 {txt}{c |}
+42207. {c |} {res} 5059 {txt}{c |}
+42208. {c |} {res} 9883 {txt}{c |}
+42209. {c |} {res}13397 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42210. {c |} {res}10326 {txt}{c |}
+42211. {c |} {res} 8748 {txt}{c |}
+42212. {c |} {res}  898 {txt}{c |}
+42213. {c |} {res}17729 {txt}{c |}
+42214. {c |} {res}15868 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42215. {c |} {res}  580 {txt}{c |}
+42216. {c |} {res} 9010 {txt}{c |}
+42217. {c |} {res}30918 {txt}{c |}
+42218. {c |} {res} 3317 {txt}{c |}
+42219. {c |} {res}32416 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42220. {c |} {res}19474 {txt}{c |}
+42221. {c |} {res}13964 {txt}{c |}
+42222. {c |} {res}23737 {txt}{c |}
+42223. {c |} {res}17466 {txt}{c |}
+42224. {c |} {res}  939 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42225. {c |} {res}32291 {txt}{c |}
+42226. {c |} {res}19049 {txt}{c |}
+42227. {c |} {res}17042 {txt}{c |}
+42228. {c |} {res} 7828 {txt}{c |}
+42229. {c |} {res}28926 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42230. {c |} {res}14532 {txt}{c |}
+42231. {c |} {res}32351 {txt}{c |}
+42232. {c |} {res} 7605 {txt}{c |}
+42233. {c |} {res} 5104 {txt}{c |}
+42234. {c |} {res}16734 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42235. {c |} {res}17724 {txt}{c |}
+42236. {c |} {res} 1461 {txt}{c |}
+42237. {c |} {res}27384 {txt}{c |}
+42238. {c |} {res}28321 {txt}{c |}
+42239. {c |} {res}29191 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42240. {c |} {res}12084 {txt}{c |}
+42241. {c |} {res}37238 {txt}{c |}
+42242. {c |} {res}17049 {txt}{c |}
+42243. {c |} {res}23276 {txt}{c |}
+42244. {c |} {res}25433 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42245. {c |} {res} 3710 {txt}{c |}
+42246. {c |} {res}35947 {txt}{c |}
+42247. {c |} {res} 5531 {txt}{c |}
+42248. {c |} {res} 2067 {txt}{c |}
+42249. {c |} {res} 3114 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42250. {c |} {res}22996 {txt}{c |}
+42251. {c |} {res}32501 {txt}{c |}
+42252. {c |} {res} 9577 {txt}{c |}
+42253. {c |} {res} 4281 {txt}{c |}
+42254. {c |} {res}35386 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42255. {c |} {res}36759 {txt}{c |}
+42256. {c |} {res} 2197 {txt}{c |}
+42257. {c |} {res}  510 {txt}{c |}
+42258. {c |} {res}15214 {txt}{c |}
+42259. {c |} {res}32455 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42260. {c |} {res}30362 {txt}{c |}
+42261. {c |} {res}14942 {txt}{c |}
+42262. {c |} {res}25328 {txt}{c |}
+42263. {c |} {res} 7454 {txt}{c |}
+42264. {c |} {res}22497 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42265. {c |} {res}15226 {txt}{c |}
+42266. {c |} {res} 3080 {txt}{c |}
+42267. {c |} {res}21513 {txt}{c |}
+42268. {c |} {res}35874 {txt}{c |}
+42269. {c |} {res} 8042 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42270. {c |} {res}10842 {txt}{c |}
+42271. {c |} {res}34326 {txt}{c |}
+42272. {c |} {res}18628 {txt}{c |}
+42273. {c |} {res} 1385 {txt}{c |}
+42274. {c |} {res} 2111 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42275. {c |} {res} 8812 {txt}{c |}
+42276. {c |} {res}13973 {txt}{c |}
+42277. {c |} {res}14433 {txt}{c |}
+42278. {c |} {res}16930 {txt}{c |}
+42279. {c |} {res} 7519 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42280. {c |} {res}26652 {txt}{c |}
+42281. {c |} {res}12033 {txt}{c |}
+42282. {c |} {res}25038 {txt}{c |}
+42283. {c |} {res}36981 {txt}{c |}
+42284. {c |} {res}35605 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42285. {c |} {res}28212 {txt}{c |}
+42286. {c |} {res}25053 {txt}{c |}
+42287. {c |} {res}11437 {txt}{c |}
+42288. {c |} {res}20171 {txt}{c |}
+42289. {c |} {res}15700 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42290. {c |} {res}14461 {txt}{c |}
+42291. {c |} {res} 8764 {txt}{c |}
+42292. {c |} {res} 7324 {txt}{c |}
+42293. {c |} {res}35681 {txt}{c |}
+42294. {c |} {res}35725 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42295. {c |} {res}16841 {txt}{c |}
+42296. {c |} {res}11059 {txt}{c |}
+42297. {c |} {res} 9157 {txt}{c |}
+42298. {c |} {res}25893 {txt}{c |}
+42299. {c |} {res}   79 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42300. {c |} {res} 8072 {txt}{c |}
+42301. {c |} {res}12267 {txt}{c |}
+42302. {c |} {res}19179 {txt}{c |}
+42303. {c |} {res}15277 {txt}{c |}
+42304. {c |} {res}34393 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42305. {c |} {res} 2285 {txt}{c |}
+42306. {c |} {res}  233 {txt}{c |}
+42307. {c |} {res} 7753 {txt}{c |}
+42308. {c |} {res}29840 {txt}{c |}
+42309. {c |} {res}18364 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42310. {c |} {res}15468 {txt}{c |}
+42311. {c |} {res}18247 {txt}{c |}
+42312. {c |} {res}22094 {txt}{c |}
+42313. {c |} {res}35031 {txt}{c |}
+42314. {c |} {res} 6377 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42315. {c |} {res} 6360 {txt}{c |}
+42316. {c |} {res} 1398 {txt}{c |}
+42317. {c |} {res}14887 {txt}{c |}
+42318. {c |} {res}18088 {txt}{c |}
+42319. {c |} {res}17697 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42320. {c |} {res} 8110 {txt}{c |}
+42321. {c |} {res}19480 {txt}{c |}
+42322. {c |} {res}14240 {txt}{c |}
+42323. {c |} {res}13778 {txt}{c |}
+42324. {c |} {res}  895 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42325. {c |} {res}25849 {txt}{c |}
+42326. {c |} {res} 4595 {txt}{c |}
+42327. {c |} {res}12680 {txt}{c |}
+42328. {c |} {res} 5222 {txt}{c |}
+42329. {c |} {res}26678 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42330. {c |} {res}36608 {txt}{c |}
+42331. {c |} {res}34832 {txt}{c |}
+42332. {c |} {res}15730 {txt}{c |}
+42333. {c |} {res}24158 {txt}{c |}
+42334. {c |} {res}22179 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42335. {c |} {res}18256 {txt}{c |}
+42336. {c |} {res} 6778 {txt}{c |}
+42337. {c |} {res}20748 {txt}{c |}
+42338. {c |} {res}14903 {txt}{c |}
+42339. {c |} {res}25015 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42340. {c |} {res}21661 {txt}{c |}
+42341. {c |} {res}21757 {txt}{c |}
+42342. {c |} {res}25064 {txt}{c |}
+42343. {c |} {res}23071 {txt}{c |}
+42344. {c |} {res}33757 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42345. {c |} {res}25131 {txt}{c |}
+42346. {c |} {res}14325 {txt}{c |}
+42347. {c |} {res}30066 {txt}{c |}
+42348. {c |} {res}21338 {txt}{c |}
+42349. {c |} {res} 8600 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42350. {c |} {res}  814 {txt}{c |}
+42351. {c |} {res}29064 {txt}{c |}
+42352. {c |} {res} 7449 {txt}{c |}
+42353. {c |} {res}28558 {txt}{c |}
+42354. {c |} {res}16739 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42355. {c |} {res} 6268 {txt}{c |}
+42356. {c |} {res} 5050 {txt}{c |}
+42357. {c |} {res}12880 {txt}{c |}
+42358. {c |} {res}19361 {txt}{c |}
+42359. {c |} {res} 6526 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42360. {c |} {res} 1490 {txt}{c |}
+42361. {c |} {res} 8899 {txt}{c |}
+42362. {c |} {res}24537 {txt}{c |}
+42363. {c |} {res} 2062 {txt}{c |}
+42364. {c |} {res}37074 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42365. {c |} {res}27490 {txt}{c |}
+42366. {c |} {res}32508 {txt}{c |}
+42367. {c |} {res}15563 {txt}{c |}
+42368. {c |} {res}14046 {txt}{c |}
+42369. {c |} {res}16377 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42370. {c |} {res}20663 {txt}{c |}
+42371. {c |} {res}13996 {txt}{c |}
+42372. {c |} {res}20140 {txt}{c |}
+42373. {c |} {res}  900 {txt}{c |}
+42374. {c |} {res}25405 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42375. {c |} {res}24849 {txt}{c |}
+42376. {c |} {res}10115 {txt}{c |}
+42377. {c |} {res} 3868 {txt}{c |}
+42378. {c |} {res}16946 {txt}{c |}
+42379. {c |} {res}23782 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42380. {c |} {res} 3365 {txt}{c |}
+42381. {c |} {res} 7625 {txt}{c |}
+42382. {c |} {res} 2854 {txt}{c |}
+42383. {c |} {res} 6884 {txt}{c |}
+42384. {c |} {res} 2881 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42385. {c |} {res} 5823 {txt}{c |}
+42386. {c |} {res}37745 {txt}{c |}
+42387. {c |} {res} 8237 {txt}{c |}
+42388. {c |} {res} 8414 {txt}{c |}
+42389. {c |} {res}19354 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42390. {c |} {res}11273 {txt}{c |}
+42391. {c |} {res}25778 {txt}{c |}
+42392. {c |} {res}14394 {txt}{c |}
+42393. {c |} {res}16288 {txt}{c |}
+42394. {c |} {res}23512 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42395. {c |} {res}33807 {txt}{c |}
+42396. {c |} {res}14017 {txt}{c |}
+42397. {c |} {res}14699 {txt}{c |}
+42398. {c |} {res}31961 {txt}{c |}
+42399. {c |} {res}28098 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42400. {c |} {res}27782 {txt}{c |}
+42401. {c |} {res}25279 {txt}{c |}
+42402. {c |} {res}14577 {txt}{c |}
+42403. {c |} {res}35247 {txt}{c |}
+42404. {c |} {res} 7487 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42405. {c |} {res}34339 {txt}{c |}
+42406. {c |} {res} 2972 {txt}{c |}
+42407. {c |} {res}18007 {txt}{c |}
+42408. {c |} {res}29568 {txt}{c |}
+42409. {c |} {res} 3624 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42410. {c |} {res}31914 {txt}{c |}
+42411. {c |} {res} 1036 {txt}{c |}
+42412. {c |} {res}  519 {txt}{c |}
+42413. {c |} {res}16832 {txt}{c |}
+42414. {c |} {res}13615 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42415. {c |} {res}16509 {txt}{c |}
+42416. {c |} {res} 7387 {txt}{c |}
+42417. {c |} {res}10287 {txt}{c |}
+42418. {c |} {res}19363 {txt}{c |}
+42419. {c |} {res}33045 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42420. {c |} {res} 7136 {txt}{c |}
+42421. {c |} {res} 6850 {txt}{c |}
+42422. {c |} {res}15363 {txt}{c |}
+42423. {c |} {res}26656 {txt}{c |}
+42424. {c |} {res} 3122 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42425. {c |} {res}36859 {txt}{c |}
+42426. {c |} {res}36398 {txt}{c |}
+42427. {c |} {res} 1161 {txt}{c |}
+42428. {c |} {res} 5896 {txt}{c |}
+42429. {c |} {res}25264 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42430. {c |} {res} 4812 {txt}{c |}
+42431. {c |} {res}21790 {txt}{c |}
+42432. {c |} {res} 2771 {txt}{c |}
+42433. {c |} {res}33273 {txt}{c |}
+42434. {c |} {res}22027 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42435. {c |} {res}19966 {txt}{c |}
+42436. {c |} {res}20053 {txt}{c |}
+42437. {c |} {res} 4229 {txt}{c |}
+42438. {c |} {res} 4643 {txt}{c |}
+42439. {c |} {res}11691 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42440. {c |} {res}18133 {txt}{c |}
+42441. {c |} {res}10200 {txt}{c |}
+42442. {c |} {res}36843 {txt}{c |}
+42443. {c |} {res}10871 {txt}{c |}
+42444. {c |} {res}15313 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42445. {c |} {res}17708 {txt}{c |}
+42446. {c |} {res} 5057 {txt}{c |}
+42447. {c |} {res}31785 {txt}{c |}
+42448. {c |} {res}16848 {txt}{c |}
+42449. {c |} {res}29994 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42450. {c |} {res} 3661 {txt}{c |}
+42451. {c |} {res} 3463 {txt}{c |}
+42452. {c |} {res}14121 {txt}{c |}
+42453. {c |} {res}36794 {txt}{c |}
+42454. {c |} {res}14511 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42455. {c |} {res} 3745 {txt}{c |}
+42456. {c |} {res}11199 {txt}{c |}
+42457. {c |} {res} 5929 {txt}{c |}
+42458. {c |} {res}26455 {txt}{c |}
+42459. {c |} {res}29894 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42460. {c |} {res}30865 {txt}{c |}
+42461. {c |} {res}28979 {txt}{c |}
+42462. {c |} {res} 9542 {txt}{c |}
+42463. {c |} {res} 4717 {txt}{c |}
+42464. {c |} {res}17402 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42465. {c |} {res} 2489 {txt}{c |}
+42466. {c |} {res}10357 {txt}{c |}
+42467. {c |} {res} 8371 {txt}{c |}
+42468. {c |} {res} 5607 {txt}{c |}
+42469. {c |} {res}30839 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42470. {c |} {res}20859 {txt}{c |}
+42471. {c |} {res}10628 {txt}{c |}
+42472. {c |} {res}37222 {txt}{c |}
+42473. {c |} {res} 2635 {txt}{c |}
+42474. {c |} {res}27669 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42475. {c |} {res}10793 {txt}{c |}
+42476. {c |} {res}22715 {txt}{c |}
+42477. {c |} {res} 7475 {txt}{c |}
+42478. {c |} {res}29866 {txt}{c |}
+42479. {c |} {res}30089 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42480. {c |} {res}17495 {txt}{c |}
+42481. {c |} {res}13308 {txt}{c |}
+42482. {c |} {res}13105 {txt}{c |}
+42483. {c |} {res} 1719 {txt}{c |}
+42484. {c |} {res}11443 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42485. {c |} {res}22089 {txt}{c |}
+42486. {c |} {res}17377 {txt}{c |}
+42487. {c |} {res} 9860 {txt}{c |}
+42488. {c |} {res}21039 {txt}{c |}
+42489. {c |} {res}35661 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42490. {c |} {res}29756 {txt}{c |}
+42491. {c |} {res} 5820 {txt}{c |}
+42492. {c |} {res} 5097 {txt}{c |}
+42493. {c |} {res}  413 {txt}{c |}
+42494. {c |} {res}15815 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42495. {c |} {res}16677 {txt}{c |}
+42496. {c |} {res}18130 {txt}{c |}
+42497. {c |} {res}27341 {txt}{c |}
+42498. {c |} {res} 6657 {txt}{c |}
+42499. {c |} {res} 9791 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42500. {c |} {res}30554 {txt}{c |}
+42501. {c |} {res}27603 {txt}{c |}
+42502. {c |} {res}30485 {txt}{c |}
+42503. {c |} {res}21937 {txt}{c |}
+42504. {c |} {res}15253 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42505. {c |} {res} 1534 {txt}{c |}
+42506. {c |} {res} 4749 {txt}{c |}
+42507. {c |} {res}21083 {txt}{c |}
+42508. {c |} {res}16361 {txt}{c |}
+42509. {c |} {res}30842 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42510. {c |} {res}24566 {txt}{c |}
+42511. {c |} {res}25220 {txt}{c |}
+42512. {c |} {res}28529 {txt}{c |}
+42513. {c |} {res}30740 {txt}{c |}
+42514. {c |} {res}29488 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42515. {c |} {res}14664 {txt}{c |}
+42516. {c |} {res}35749 {txt}{c |}
+42517. {c |} {res}29377 {txt}{c |}
+42518. {c |} {res} 7166 {txt}{c |}
+42519. {c |} {res} 8876 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42520. {c |} {res}34788 {txt}{c |}
+42521. {c |} {res} 3993 {txt}{c |}
+42522. {c |} {res}14662 {txt}{c |}
+42523. {c |} {res}22731 {txt}{c |}
+42524. {c |} {res}26160 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42525. {c |} {res}16410 {txt}{c |}
+42526. {c |} {res}17406 {txt}{c |}
+42527. {c |} {res}26439 {txt}{c |}
+42528. {c |} {res}26776 {txt}{c |}
+42529. {c |} {res} 5091 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42530. {c |} {res}34849 {txt}{c |}
+42531. {c |} {res}35794 {txt}{c |}
+42532. {c |} {res} 3467 {txt}{c |}
+42533. {c |} {res}26323 {txt}{c |}
+42534. {c |} {res}14178 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42535. {c |} {res}20675 {txt}{c |}
+42536. {c |} {res}12366 {txt}{c |}
+42537. {c |} {res}11243 {txt}{c |}
+42538. {c |} {res} 5009 {txt}{c |}
+42539. {c |} {res} 1911 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42540. {c |} {res}35955 {txt}{c |}
+42541. {c |} {res}28457 {txt}{c |}
+42542. {c |} {res}10153 {txt}{c |}
+42543. {c |} {res} 3419 {txt}{c |}
+42544. {c |} {res} 8438 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42545. {c |} {res}23655 {txt}{c |}
+42546. {c |} {res} 3113 {txt}{c |}
+42547. {c |} {res}13580 {txt}{c |}
+42548. {c |} {res}28634 {txt}{c |}
+42549. {c |} {res}25028 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42550. {c |} {res}20499 {txt}{c |}
+42551. {c |} {res}18389 {txt}{c |}
+42552. {c |} {res}  290 {txt}{c |}
+42553. {c |} {res}10786 {txt}{c |}
+42554. {c |} {res}22864 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42555. {c |} {res} 5519 {txt}{c |}
+42556. {c |} {res}17839 {txt}{c |}
+42557. {c |} {res}24953 {txt}{c |}
+42558. {c |} {res}13212 {txt}{c |}
+42559. {c |} {res}35201 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42560. {c |} {res}11181 {txt}{c |}
+42561. {c |} {res}30680 {txt}{c |}
+42562. {c |} {res}11537 {txt}{c |}
+42563. {c |} {res}12644 {txt}{c |}
+42564. {c |} {res} 7094 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42565. {c |} {res}31684 {txt}{c |}
+42566. {c |} {res} 5933 {txt}{c |}
+42567. {c |} {res} 2676 {txt}{c |}
+42568. {c |} {res}32856 {txt}{c |}
+42569. {c |} {res}22273 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42570. {c |} {res}27799 {txt}{c |}
+42571. {c |} {res} 7583 {txt}{c |}
+42572. {c |} {res}27835 {txt}{c |}
+42573. {c |} {res}34885 {txt}{c |}
+42574. {c |} {res}15785 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42575. {c |} {res}15911 {txt}{c |}
+42576. {c |} {res}36004 {txt}{c |}
+42577. {c |} {res} 7075 {txt}{c |}
+42578. {c |} {res}34139 {txt}{c |}
+42579. {c |} {res}22586 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42580. {c |} {res}32258 {txt}{c |}
+42581. {c |} {res}25648 {txt}{c |}
+42582. {c |} {res}31157 {txt}{c |}
+42583. {c |} {res}34718 {txt}{c |}
+42584. {c |} {res}15426 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42585. {c |} {res} 8519 {txt}{c |}
+42586. {c |} {res} 4871 {txt}{c |}
+42587. {c |} {res} 7506 {txt}{c |}
+42588. {c |} {res}31791 {txt}{c |}
+42589. {c |} {res}17756 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42590. {c |} {res}18093 {txt}{c |}
+42591. {c |} {res}26302 {txt}{c |}
+42592. {c |} {res} 6244 {txt}{c |}
+42593. {c |} {res} 2998 {txt}{c |}
+42594. {c |} {res}28617 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42595. {c |} {res}36778 {txt}{c |}
+42596. {c |} {res}21888 {txt}{c |}
+42597. {c |} {res} 2452 {txt}{c |}
+42598. {c |} {res} 1527 {txt}{c |}
+42599. {c |} {res} 8662 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42600. {c |} {res}20234 {txt}{c |}
+42601. {c |} {res} 5026 {txt}{c |}
+42602. {c |} {res} 1693 {txt}{c |}
+42603. {c |} {res}35507 {txt}{c |}
+42604. {c |} {res}20831 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42605. {c |} {res} 8778 {txt}{c |}
+42606. {c |} {res}17348 {txt}{c |}
+42607. {c |} {res}30053 {txt}{c |}
+42608. {c |} {res} 4009 {txt}{c |}
+42609. {c |} {res}25414 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42610. {c |} {res}13052 {txt}{c |}
+42611. {c |} {res} 4051 {txt}{c |}
+42612. {c |} {res}32582 {txt}{c |}
+42613. {c |} {res}15857 {txt}{c |}
+42614. {c |} {res} 7833 {txt}{c |}
+       {c LT}{hline 7}{c RT}
+42615. {c |} {res}13976 {txt}{c |}
+42616. {c |} {res}13489 {txt}{c |}
+42617. {c |} {res} 8259 {txt}{c |}
+42618. {c |} {res}35282 {txt}{c |}
+42619. {c |} {res}34190 {txt}{c |}
+       {c BLC}{hline 7}{c BRC}
+
+{com}. replace cluster_ordered = 1 if missing(cluster_ordered)
+{txt}(890 real changes made)
+
+{com}. 
+. 
+. capture label drop 
+{txt}
+{com}. label define cluster_lbl 0 "Low-Low" 1 "M-H, M-L" 2 "High-High", replace
+{txt}
+{com}. label values cluster_ordered cluster_lbl
+{txt}
+{com}. 
+. tab cluster_ordered
+
+{txt}cluster_ord {c |}
+       ered {c |}      Freq.     Percent        Cum.
+{hline 12}{c +}{hline 35}
+    Low-Low {c |}{res}     13,487       31.65       31.65
+{txt}   M-H, M-L {c |}{res}     15,856       37.20       68.85
+{txt}  High-High {c |}{res}     13,276       31.15      100.00
+{txt}{hline 12}{c +}{hline 35}
+      Total {c |}{res}     42,619      100.00
+{txt}
+{com}. 
+. save UK_fooddesertdatafinalizedIMD, replace
+{txt}{p 0 4 2}
+file {bf}
+UK_fooddesertdatafinalizedIMD.dta{rm}
+saved
+{p_end}
+
+{com}. 
+. 
+. 
+. 
+. spmap cluster_ordered using uk_coords, id(_ID) ///
+>     fcolor("0 102 204" "211 211 211" "204 0 0") clmethod(unique)
+{res}{txt}
+{com}. 
+. *-----------------------------*
+. * Step 11: Save Map Output
+. *-----------------------------*
+. graph save "E:\16GBBACKUPUSB\BACKUP_USB_SEPTEMBER2014\May Baydoun_folder\UK_BIOBANK_PROJECT\UKB_PAPER20_ADI_FOODESERT\FIGURES\FIGURE1.gph", replace
+{txt}{p 0 4 2}
+(file {bf}
+E:\16GBBACKUPUSB\BACKUP_USB_SEPTEMBER2014\May Baydoun_folder\UK_BIOBANK_PROJECT\UKB_PAPER20_ADI_FOODESERT\FIGURES\FIGURE1.gph{rm}
+not found)
+{p_end}
+{res}{txt}file {bf:E:\16GBBACKUPUSB\BACKUP_USB_SEPTEMBER2014\May Baydoun_folder\UK_BIOBANK_PROJECT\UKB_PAPER20_ADI_FOODESERT\FIGURES\FIGURE1.gph} saved
+
+{com}. graph export "E:\16GBBACKUPUSB\BACKUP_USB_SEPTEMBER2014\May Baydoun_folder\UK_BIOBANK_PROJECT\UKB_PAPER20_ADI_FOODESERT\FIGURES\FIGURE1.png", width(2000) replace
+{txt}{p 0 4 2}
+(file {bf}
+E:\16GBBACKUPUSB\BACKUP_USB_SEPTEMBER2014\May Baydoun_folder\UK_BIOBANK_PROJECT\UKB_PAPER20_ADI_FOODESERT\FIGURES\FIGURE1.png{rm}
+not found)
+{p_end}
+{p 0 4 2}
+file {bf}
+E:\16GBBACKUPUSB\BACKUP_USB_SEPTEMBER2014\May Baydoun_folder\UK_BIOBANK_PROJECT\UKB_PAPER20_ADI_FOODESERT\FIGURES\FIGURE1.png{rm}
+saved as
+PNG
+format
+{p_end}
+
+{com}. 
+. *-----------------------------*
+. * Step 12: Save Final Dataset
+. *-----------------------------*
+. save UK_fooddesertdatafinalizedIMD_merged, replace
+{txt}{p 0 4 2}
+file {bf}
+UK_fooddesertdatafinalizedIMD_merged.dta{rm}
+saved
+{p_end}
+
+{com}. 
+. 
+. *******************SPATIAL CORRELATIONS, MLOGIT********************
+. 
+. unzipfile infuse_lsoa_lyr_2011_clipped.zip,replace
+{res}{text:    inflating: infuse_lsoa_lyr_2011_clipped.dbf}
+{text:    inflating: infuse_lsoa_lyr_2011_clipped.prj}
+{text:    inflating: infuse_lsoa_lyr_2011_clipped.shp}
+{text:    inflating: infuse_lsoa_lyr_2011_clipped.shx}
+{text:    inflating: TermsAndConditions.html}
+
+{text:successfully unzipped infuse_lsoa_lyr_2011_clipped.zip to current directory}
+{text:total processed:  5}
+{text:        skipped:  0}
+{text:      extracted:  5}
+{txt}
+{com}. 
+. spshape2dta infuse_lsoa_lyr_2011_clipped
+{res}{err}{p 0 4 2}
+file {bf:{err}infuse_lsoa_lyr_2011_clipped_shp.dta}
+already exists
+{p_end}
+{txt}{search r(602), local:r(602);}
+
+end of do-file
+
+{search r(602), local:r(602);}
+
+{com}. do "C:\Users\baydounm\AppData\Local\Temp\STD5dd4_000000.tmp"
+{txt}
+{com}. 
+. spshape2dta infuse_lsoa_lyr_2011_clipped,replace
+{res}{txt}{col 3}(importing .shp file)
+{col 3}(importing .dbf file)
+  (creating _ID spatial-unit id)
+{res}{txt}  (creating _CX coordinate)
+  (creating _CY coordinate)
+
+  file infuse_lsoa_lyr_2011_clipped_shp.dta created
+  file infuse_lsoa_lyr_2011_clipped.dta     created
+
+{com}. 
+. save uk_coords_shp, replace 
+{txt}{p 0 4 2}
+file {bf}
+uk_coords_shp.dta{rm}
+saved
+{p_end}
+
+{com}. 
+. use uk_coords_shp,clear
+{txt}
+{com}. 
+. **spmatrix create contiguity W
+. 
+. use UK_fooddesertdatafinalizedIMD_merged,clear
+{txt}
+{com}. 
+. tab zsoa_pctinv_cluster zfd_cluster, row col chi 
+{txt}
+{c TLC}{hline 19}{c TRC}
+{c |} Key{col 21}{c |}
+{c LT}{hline 19}{c RT}
+{c |}{space 5}{it:frequency}{col 21}{c |}
+{c |}{space 2}{it:row percentage}{col 21}{c |}
+{c |}{space 1}{it:column percentage}{col 21}{c |}
+{c BLC}{hline 19}{c BRC}
+
+         4 {c |}
+ quantiles {c |}
+        of {c |}
+zsoa_pctin {c |}             4 quantiles of zfd
+         v {c |}         1          2          3          4 {c |}     Total
+{hline 11}{c +}{hline 44}{c +}{hline 10}
+         1 {c |}{res}     4,603      3,005      2,021      1,013 {txt}{c |}{res}    10,642 
+           {txt}{c |}{res}     43.25      28.24      18.99       9.52 {txt}{c |}{res}    100.00 
+           {txt}{c |}{res}     44.12      28.81      19.37       9.71 {txt}{c |}{res}     25.50 
+{txt}{hline 11}{c +}{hline 44}{c +}{hline 10}
+         2 {c |}{res}     3,312      2,567      2,160      2,394 {txt}{c |}{res}    10,433 
+           {txt}{c |}{res}     31.75      24.60      20.70      22.95 {txt}{c |}{res}    100.00 
+           {txt}{c |}{res}     31.75      24.61      20.71      22.95 {txt}{c |}{res}     25.00 
+{txt}{hline 11}{c +}{hline 44}{c +}{hline 10}
+         3 {c |}{res}     2,201      3,174      2,962      2,095 {txt}{c |}{res}    10,432 
+           {txt}{c |}{res}     21.10      30.43      28.39      20.08 {txt}{c |}{res}    100.00 
+           {txt}{c |}{res}     21.10      30.43      28.39      20.08 {txt}{c |}{res}     25.00 
+{txt}{hline 11}{c +}{hline 44}{c +}{hline 10}
+         4 {c |}{res}       317      1,686      3,289      4,930 {txt}{c |}{res}    10,222 
+           {txt}{c |}{res}      3.10      16.49      32.18      48.23 {txt}{c |}{res}    100.00 
+           {txt}{c |}{res}      3.04      16.16      31.53      47.26 {txt}{c |}{res}     24.50 
+{txt}{hline 11}{c +}{hline 44}{c +}{hline 10}
+     Total {c |}{res}    10,433     10,432     10,432     10,432 {txt}{c |}{res}    41,729 
+           {txt}{c |}{res}     25.00      25.00      25.00      25.00 {txt}{c |}{res}    100.00 
+           {txt}{c |}{res}    100.00     100.00     100.00     100.00 {txt}{c |}{res}    100.00 
+
+{txt}          Pearson chi2({res}9{txt}) = {res} 7.9e+03  {txt} Pr = {res}0.000
+{txt}
+{com}. 
+. mlogit zsoa_pctinv_cluster zfd_cluster, rrr
+
+{res}{txt}Iteration 0:{space 2}Log likelihood = {res: -57844.45}  
+Iteration 1:{space 2}Log likelihood = {res:-54031.451}  
+Iteration 2:{space 2}Log likelihood = {res:-53807.112}  
+Iteration 3:{space 2}Log likelihood = {res:-53805.628}  
+Iteration 4:{space 2}Log likelihood = {res:-53805.628}  
+{res}
+{txt}{col 1}Multinomial logistic regression{col 56}{lalign 13:Number of obs}{col 69} = {res}{ralign 7:41,729}
+{txt}{col 56}{lalign 13:LR chi2({res:3})}{col 69} = {res}{ralign 7:8077.64}
+{txt}{col 56}{lalign 13:Prob > chi2}{col 69} = {res}{ralign 7:0.0000}
+{txt}{col 1}{lalign 14:Log likelihood}{col 15} = {res}{ralign 10:-53805.628}{txt}{col 56}{lalign 13:Pseudo R2}{col 69} = {res}{ralign 7:0.0698}
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1}zsoa_pctin~r{col 14}{c |}        RRR{col 26}   Std. err.{col 38}      z{col 46}   P>|z|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1}{res}1           {col 14}{txt}{c |}  (base outcome)
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}2            {txt}{c |}
+{space 1}zfd_cluster {c |}{col 14}{res}{space 2} 1.450747{col 26}{space 2} .0195951{col 37}{space 1}   27.55{col 46}{space 3}0.000{col 54}{space 4} 1.412845{col 67}{space 3} 1.489665
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} .4417255{col 26}{space 2} .0141602{col 37}{space 1}  -25.49{col 46}{space 3}0.000{col 54}{space 4} .4148258{col 67}{space 3} .4703695
+{txt}{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}3            {txt}{c |}
+{space 1}zfd_cluster {c |}{col 14}{res}{space 2} 1.617473{col 26}{space 2} .0219002{col 37}{space 1}   35.52{col 46}{space 3}0.000{col 54}{space 4} 1.575114{col 67}{space 3} 1.660971
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} .3397674{col 26}{space 2} .0111768{col 37}{space 1}  -32.82{col 46}{space 3}0.000{col 54}{space 4} .3185524{col 67}{space 3} .3623952
+{txt}{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}4            {txt}{c |}
+{space 1}zfd_cluster {c |}{col 14}{res}{space 2} 3.433045{col 26}{space 2}  .053976{col 37}{space 1}   78.45{col 46}{space 3}0.000{col 54}{space 4} 3.328867{col 67}{space 3} 3.540483
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} .0378752{col 26}{space 2} .0017125{col 37}{space 1}  -72.40{col 46}{space 3}0.000{col 54}{space 4} .0346632{col 67}{space 3} .0413847
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{p 0 6 2}Note: {bf:_cons} estimates baseline relative risk{txt} for each outcome{txt}.{p_end}
+
+{com}. 
+. reg zfd zsoa_pctinv
+
+{txt}      Source {c |}       SS           df       MS      Number of obs   ={res}    41,729
+{txt}{hline 13}{c +}{hline 34}   F(1, 41727)     = {res}  7751.05
+{txt}       Model {c |} {res} 6536.95683         1  6536.95683   {txt}Prob > F        ={res}    0.0000
+{txt}    Residual {c |} {res} 35191.0432    41,727  .843363846   {txt}R-squared       ={res}    0.1567
+{txt}{hline 13}{c +}{hline 34}   Adj R-squared   ={res}    0.1566
+{txt}       Total {c |} {res}      41728    41,728           1   {txt}Root MSE        =   {res} .91835
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1}         zfd{col 14}{c |} Coefficient{col 26}  Std. err.{col 38}      t{col 46}   P>|t|{col 54}     [95% con{col 67}f. interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 1}zsoa_pctinv {c |}{col 14}{res}{space 2} .3957988{col 26}{space 2} .0044957{col 37}{space 1}   88.04{col 46}{space 3}0.000{col 54}{space 4} .3869872{col 67}{space 3} .4046104
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2}-.0000151{col 26}{space 2} .0044956{col 37}{space 1}   -0.00{col 46}{space 3}0.997{col 54}{space 4}-.0088265{col 67}{space 3} .0087964
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}{txt}
+{com}. 
+. lpoly zfd zsoa_pctinv
+{res}{txt}
+{com}. 
+. graph save "E:\16GBBACKUPUSB\BACKUP_USB_SEPTEMBER2014\May Baydoun_folder\UK_BIOBANK_PROJECT\UKB_PAPER20_ADI_FOODESERT\FIGURES\FIGURE2.gph",replace
+{txt}{p 0 4 2}
+(file {bf}
+E:\16GBBACKUPUSB\BACKUP_USB_SEPTEMBER2014\May Baydoun_folder\UK_BIOBANK_PROJECT\UKB_PAPER20_ADI_FOODESERT\FIGURES\FIGURE2.gph{rm}
+not found)
+{p_end}
+{res}{txt}file {bf:E:\16GBBACKUPUSB\BACKUP_USB_SEPTEMBER2014\May Baydoun_folder\UK_BIOBANK_PROJECT\UKB_PAPER20_ADI_FOODESERT\FIGURES\FIGURE2.gph} saved
+
+{com}. 
+{txt}end of do-file
+
+{com}. do "C:\Users\baydounm\AppData\Local\Temp\STD5dd4_000000.tmp"
+{txt}
+{com}. capture log close
+{smcl}
+{com}{sf}{ul off}
