@@ -1,0 +1,9 @@
+﻿variable,description
+LSOA,"Statistical unit area (SOA) code - ONS LSOA 2011 (LSOA11CD), Scottish Data Zone 2011 (DZ11CD) or Northern Ireland Super Output Area (SOA11CD) "
+LANAME,Local Authority (LA) District name (as of 2019) (LAD19NM)
+Rank,A simple ranking of the SOA from most to least deprived.
+SOA_pct,Percentage - where the most deprived 1% of SOAs are 1 and the next most deprived 1% are 2 etc.
+SOA_decile,Grouping the most deprived 10% of SOAs as Decile 1 and the second most deprived 10% as decile 2 etc.
+LA_Rank,A simple ranking of the LA from most to least deprived.
+LA_pct,Percentage - where the most deprived 1% of LAs are 1 and the next most deprived 1% are 2 etc.
+LA_decile,Grouping the most deprived 10% of LAs as Decile 1 and the second most deprived 10% as decile 2 etc.
