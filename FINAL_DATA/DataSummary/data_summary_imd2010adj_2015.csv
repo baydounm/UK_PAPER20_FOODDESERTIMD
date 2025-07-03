@@ -1,0 +1,62 @@
+variable,type,num_values,num_unique_values,num_nulls,proportion_nulls,min_length,max_length,min,max,mean,median,stddev
+LSOA code (2011),String,32844,32844,0,0.0,9,9,,,,,
+LSOA name (2011),String,32844,32844,0,0.0,9,33,,,,,
+Local Authority District code (2013),String,32844,326,0,0.0,9,9,,,,,
+Local Authority District name (2013),String,32844,326,0,0.0,4,28,,,,,
+2010IMD adjusted,Numeric,32844,6100,0,0.0,,,0.53,87.8,21.63235385458531,17.24,15.468409415624787
+2010National quintile1,Numeric,32844,5,0,0.0,,,1.0,5.0,2.9999391060772136,3.0,1.4142135610620545
+2010National decile2,Numeric,32844,10,0,0.0,,,1.0,10.0,5.499878212154427,5.5,2.8723250478048077
+2010imd_rank,Numeric,32844,32844,0,0.0,,,1.0,32844.0,16422.5,16422.5,9481.390457100688
+2015Index of Multiple Deprivation (IMD) Score,Numeric,32844,23402,0,0.0,,,0.477,92.601,21.669393222506393,17.398,15.59398331588817
+2015Index of Multiple Deprivation (IMD) Rank (where 1 is most deprived),Numeric,32844,32824,0,0.0,,,1.0,32844.0,16422.499391060774,16422.5,9481.390618277399
+2015Index of Multiple Deprivation (IMD) Decile (where 1 is most deprived 10% of LSOAs),Numeric,32844,10,0,0.0,,,1.0,10.0,5.500121787845573,5.5,2.8723250478048077
+2015Income Score (rate),Numeric,32844,558,0,0.0,,,0.005,0.639,0.14522911338448422,0.114,0.10314069050392742
+2015Income Rank (where 1 is most deprived),Numeric,32844,32800,0,0.0,,,1.0,32844.0,16422.4986603337,16422.5,9481.390331145747
+2015Income Decile (where 1 is most deprived 10% of LSOAs),Numeric,32844,10,0,0.0,,,1.0,10.0,5.500121787845573,5.5,2.8723250478048077
+2015Employment Score (rate),Numeric,32844,466,0,0.0,,,0.003,0.58,0.11913737668980635,0.097,0.07679845139137571
+2015Employment Rank (where 1 is most deprived),Numeric,32844,32807,0,0.0,,,1.0,32844.0,16422.498873462428,16422.5,9481.39024622532
+2015Employment Decile (where 1 is most deprived 10% of LSOAs),Numeric,32844,10,0,0.0,,,1.0,10.0,5.500121787845573,5.5,2.8723250478048077
+"2015Education, Skills and Training Score",Numeric,32844,23943,0,0.0,,,0.006,99.502,21.69108345512118,16.2915,18.530861061475147
+"2015Education, Skills and Training Rank (where 1 is most deprived)",Numeric,32844,32822,0,0.0,,,1.0,32844.0,16422.49933016685,16422.5,9481.39074819181
+"2015Education, Skills and Training Decile (where 1 is most deprived 10% of LSOAs)",Numeric,32844,10,0,0.0,,,1.0,10.0,5.500121787845573,5.5,2.8723250478048077
+2015Health Deprivation and Disability Score,Numeric,32844,4453,0,0.0,,,-3.329,3.458,1.1874314943367002e-06,-0.02,0.8910962863975532
+2015Health Deprivation and Disability Rank (where 1 is most deprived),Numeric,32844,32835,0,0.0,,,1.0,32844.0,16422.499725977348,16422.5,9481.390467486131
+2015Health Deprivation and Disability Decile (where 1 is most deprived 10% of LSOAs),Numeric,32844,10,0,0.0,,,1.0,10.0,5.500121787845573,5.5,2.8723250478048077
+2015Crime Score,Numeric,32844,3870,0,0.0,,,-3.227,3.277,-8.829618804043457e-07,0.007,0.7814165173703265
+2015Crime Rank (where 1 is most deprived),Numeric,32844,32833,0,0.0,,,1.0,32844.0,16422.499634636464,16422.5,9481.3906064565
+2015Crime Decile (where 1 is most deprived 10% of LSOAs),Numeric,32844,10,0,0.0,,,1.0,10.0,5.500121787845573,5.5,2.8723250478048077
+2015Barriers to Housing and Services Score,Numeric,32844,21934,0,0.0,,,0.439,72.586,21.69108433808306,20.2885,10.567242519211703
+2015Barriers to Housing and Services Rank (where 1 is most deprived),Numeric,32844,32818,0,0.0,,,1.0,32844.0,16422.499208379002,16422.5,9481.390573639877
+2015Barriers to Housing and Services Decile (where 1 is most deprived 10% of LSOAs),Numeric,32844,10,0,0.0,,,1.0,10.0,5.500121787845573,5.5,2.8723250478048077
+2015Living Environment Score,Numeric,32844,23745,0,0.0,,,0.151,93.352,21.691082237242725,17.5695,15.941935215626527
+2015Living Environment Rank (where 1 is most deprived),Numeric,32844,32830,0,0.0,,,1.0,32844.0,16422.49957374254,16422.5,9481.390569760611
+2015Living Environment Decile (where 1 is most deprived 10% of LSOAs),Numeric,32844,10,0,0.0,,,1.0,10.0,5.500121787845573,5.5,2.8723250478048077
+2015Income Deprivation Affecting Children Index (IDACI) Score (rate),Numeric,32844,684,0,0.0,,,0.004,0.916,0.18451787236633785,0.148,0.1344762025596525
+2015Income Deprivation Affecting Children Index (IDACI) Rank (where 1 is most deprived),Numeric,32844,32701,0,0.0,,,1.0,32844.0,16422.49561563756,16422.5,9481.388513685108
+2015Income Deprivation Affecting Children Index (IDACI) Decile (where 1 is most deprived 10% of LSOAs),Numeric,32844,10,0,0.0,,,1.0,10.0,5.500121787845573,5.5,2.8723250478048077
+2015Income Deprivation Affecting Older People (IDAOPI) Score (rate),Numeric,32844,722,0,0.0,,,0.007,0.98,0.1856606990622336,0.15,0.1269262858261641
+2015Income Deprivation Affecting Older People (IDAOPI) Rank (where 1 is most deprived),Numeric,32844,32742,0,0.0,,,1.0,32844.0,16422.496803069054,16422.5,9481.390970942088
+2015Income Deprivation Affecting Older People (IDAOPI) Decile (where 1 is most deprived 10% of LSOAs),Numeric,32844,10,0,0.0,,,1.0,10.0,5.500121787845573,5.5,2.8723250478048077
+2015Children and Young People Sub-domain Score,Numeric,32844,4002,0,0.0,,,-2.861,2.906,1.82681768359847e-07,-0.013,0.8000562316199323
+2015Children and Young People Sub-domain Rank (where 1 is most deprived),Numeric,32844,32836,0,0.0,,,1.0,32844.0,16422.49975642431,16422.5,9481.390429489657
+2015Children and Young People Sub-domain Decile (where 1 is most deprived 10% of LSOAs),Numeric,32844,10,0,0.0,,,1.0,10.0,5.500121787845573,5.5,2.8723250478048077
+2015Adult Skills Sub-domain Score,Numeric,32844,629,0,0.0,,,0.031,0.754,0.3067756972354159,0.296,0.1135235754589643
+2015Adult Skills Sub-domain Rank (where 1 is most deprived),Numeric,32844,32782,0,0.0,,,1.0,32844.0,16422.498112288395,16422.5,9481.390656944874
+2015Adult Skills Sub-domain Decile (where 1 is most deprived 10% of LSOAs),Numeric,32844,10,0,0.0,,,1.0,10.0,5.500121787845573,5.5,2.8723250478048077
+2015Geographical Barriers Sub-domain Score,Numeric,32844,4101,0,0.0,,,-2.925,3.247,1.5832419924492885e-06,-0.038,0.7926252460150743
+2015Geographical Barriers Sub-domain Rank (where 1 is most deprived),Numeric,32844,32837,0,0.0,,,1.0,32844.0,16422.49978687127,16422.5,9481.390473472055
+2015Geographical Barriers Sub-domain Decile (where 1 is most deprived 10% of LSOAs),Numeric,32844,10,0,0.0,,,1.0,10.0,5.500121787845573,5.5,2.8723250478048077
+2015Wider Barriers Sub-domain Score,Numeric,32844,9850,0,0.0,,,-9.06,7.721,-0.001579497016197784,-0.177,2.413482582033542
+2015Wider Barriers Sub-domain Rank (where 1 is most deprived),Numeric,32844,32838,0,0.0,,,1.0,32844.0,16422.499817318232,16422.5,9481.390432177543
+2015Wider Barriers Sub-domain Decile (where 1 is most deprived 10% of LSOAs),Numeric,32844,10,0,0.0,,,1.0,10.0,5.500121787845573,5.5,2.8723250478048077
+2015Indoors Sub-domain Score,Numeric,32844,4293,0,0.0,,,-3.429,2.997,1.765923760808597e-06,0.007,0.8626116705977058
+2015Indoors Sub-domain Rank (where 1 is most deprived),Numeric,32844,32839,0,0.0,,,1.0,32844.0,16422.499847765193,16422.5,9481.390521590647
+2015Indoors Sub-domain Decile (where 1 is most deprived 10% of LSOAs),Numeric,32844,10,0,0.0,,,1.0,10.0,5.500121787845573,5.5,2.8723250478048077
+2015Outdoors Sub-domain Score,Numeric,32844,4313,0,0.0,,,-3.839,3.212,1.6745828766292385e-06,-0.021,0.8527985803193894
+2015Outdoors Sub-domain Rank (where 1 is most deprived),Numeric,32844,32836,0,0.0,,,1.0,32844.0,16422.49975642431,16422.5,9481.390589834651
+2015Outdoors Sub-domain Decile (where 1 is most deprived 10% of LSOAs),Numeric,32844,10,0,0.0,,,1.0,10.0,5.500121787845573,5.5,2.8723250478048077
+2015Total population: mid 2012 (excluding prisoners),Numeric,32844,1889,0,0.0,,,934.0,7976.0,1626.9068931920594,1572.0,315.3859759642028
+2015Dependent Children aged 0-15: mid 2012 (excluding prisoners),Numeric,32844,793,0,0.0,,,12.0,1155.0,308.43252953355255,293.0,105.88273654571357
+2015Population aged 16-59: mid 2012 (excluding prisoners),Numeric,32844,1630,0,0.0,,,329.0,7656.0,951.0755389112167,903.0,268.7567797614062
+2015Older population aged 60 and over: mid 2012 (excluding prisoners),Numeric,32844,962,0,0.0,,,1.0,1406.0,367.39882474729023,353.0,147.18200710183535
+2015Working age population 18-59/64: for use with Employment Deprivation Domain (excluding prisoners) ,Numeric,32844,4693,0,0.0,,,350.75,7743.0,957.2414063451467,907.25,265.0047721256476
