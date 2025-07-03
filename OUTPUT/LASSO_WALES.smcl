@@ -1,0 +1,661 @@
+{smcl}
+{com}{sf}{ul off}{txt}
+{com}. 
+. 
+. use  "E:\16GBBACKUPUSB\BACKUP_USB_SEPTEMBER2014\May Baydoun_folder\UK_BIOBANK_PROJECT\UKB_PAPER20_ADI_FOODESERT\DATA\UK_fooddesertdatafinalizedIMD_mergedfinalized.dta",clear
+{txt}
+{com}. 
+. 
+. ************************WALES*********************************
+. 
+. su Income_Score2019 Employment_Score2019 Health_Score2019 Education_Score2019 AccessServices_Score2019 Housing_Score2019 CommunitySafety_Score2019 PhysicalEnvironment_Score2019
+
+{txt}    Variable {c |}        Obs        Mean    Std. dev.       Min        Max
+{hline 13}{c +}{hline 57}
+Income_Sco~9 {c |}{res}      1,909    21.71551    19.94876          0        100
+{txt}Employ~e2019 {c |}{res}      1,909    21.71551    19.94876          0        100
+{txt}Health_Sco~9 {c |}{res}      1,909    21.71551    19.94876          0        100
+{txt}Educat~e2019 {c |}{res}      1,909    21.71551    19.94876          0        100
+{txt}Access~e2019 {c |}{res}      1,909    21.71551    19.94876          0        100
+{txt}{hline 13}{c +}{hline 57}
+Housing_Sc~9 {c |}{res}      1,909    21.71551    19.94876          0        100
+{txt}Commun~e2019 {c |}{res}      1,909    21.71551    19.94876          0        100
+{txt}Physic~e2019 {c |}{res}      1,909    21.71551    19.94876          0        100
+{txt}
+{com}. 
+.  
+. 
+. foreach x of varlist Income_Score2019 Employment_Score2019 Health_Score2019 Education_Score2019 AccessServices_Score2019 Housing_Score2019 CommunitySafety_Score2019 PhysicalEnvironment_Score2019 {c -(}
+{txt}  2{com}.         capture drop z`x'
+{txt}  3{com}.         egen z`x'=std(`x')
+{txt}  4{com}.         
+. {c )-}
+{txt}(48,972 missing values generated)
+(48,972 missing values generated)
+(48,972 missing values generated)
+(48,972 missing values generated)
+(48,972 missing values generated)
+(48,972 missing values generated)
+(48,972 missing values generated)
+(48,972 missing values generated)
+
+{com}. 
+. 
+. 
+. capture drop sample_LASSO_WALES
+{txt}
+{com}. sort nation lsoa
+{txt}
+{com}. save, replace
+{txt}{p 0 4 2}
+file {bf}
+E:\16GBBACKUPUSB\BACKUP_USB_SEPTEMBER2014\May Baydoun_folder\UK_BIOBANK_PROJECT\UKB_PAPER20_ADI_FOODESERT\DATA\UK_fooddesertdatafinalizedIMD_mergedfinalized.dta{rm}
+saved
+{p_end}
+
+{com}. splitsample if nation=="Wales" , generate(sample_LASSO_WALES) nsplit(2) rseed(1234)
+{res}{txt}
+{com}. tab sample_LASSO_WALES
+
+{txt}sample_LASS {c |}
+    O_WALES {c |}      Freq.     Percent        Cum.
+{hline 12}{c +}{hline 35}
+          1 {c |}{res}        955       50.03       50.03
+{txt}          2 {c |}{res}        954       49.97      100.00
+{txt}{hline 12}{c +}{hline 35}
+      Total {c |}{res}      1,909      100.00
+{txt}
+{com}. 
+. save, replace
+{txt}{p 0 4 2}
+file {bf}
+E:\16GBBACKUPUSB\BACKUP_USB_SEPTEMBER2014\May Baydoun_folder\UK_BIOBANK_PROJECT\UKB_PAPER20_ADI_FOODESERT\DATA\UK_fooddesertdatafinalizedIMD_mergedfinalized.dta{rm}
+saved
+{p_end}
+
+{com}. 
+. 
+. su zIncome_Score2019 zEmployment_Score2019 zHealth_Score2019 zEducation_Score2019 zAccessServices_Score2019 zHousing_Score2019 zCommunitySafety_Score2019 PhysicalEnvironment_Score2019
+
+{txt}    Variable {c |}        Obs        Mean    Std. dev.       Min        Max
+{hline 13}{c +}{hline 57}
+zIncome~2019 {c |}{res}      1,909   -3.01e-10           1  -1.088564   3.924279
+{txt}zEmploy~2019 {c |}{res}      1,909   -3.01e-10           1  -1.088564   3.924279
+{txt}zHealth~2019 {c |}{res}      1,909   -3.01e-10           1  -1.088564   3.924279
+{txt}zEducat~2019 {c |}{res}      1,909   -3.01e-10           1  -1.088564   3.924279
+{txt}zAccess~2019 {c |}{res}      1,909   -3.01e-10           1  -1.088564   3.924279
+{txt}{hline 13}{c +}{hline 57}
+zHousin~2019 {c |}{res}      1,909   -3.01e-10           1  -1.088564   3.924279
+{txt}zCommun~2019 {c |}{res}      1,909   -3.01e-10           1  -1.088564   3.924279
+{txt}Physic~e2019 {c |}{res}      1,909    21.71551    19.94876          0        100
+{txt}
+{com}. 
+. corr zfd zsoa_pct zIncome_Score2019 zEmployment_Score2019 zHealth_Score2019 zEducation_Score2019 zAccessServices_Score2019 zHousing_Score2019 zCommunitySafety_Score2019 PhysicalEnvironment_Score2019
+{txt}(obs=1,909)
+
+             {c |}      zfd zsoa_pct zIn~2019 zEm~2019 zHe~2019 zEd~2019 zAc~2019 zHo~2019 zCo~2019 Ph~e2019
+{hline 13}{c +}{hline 90}
+         zfd {c |}{res}   1.0000
+    {txt}zsoa_pct {c |}{res}  -0.3022   1.0000
+{txt}zIncome~2019 {c |}{res}   0.2293  -0.8807   1.0000
+{txt}zEmploy~2019 {c |}{res}   0.2459  -0.8596   0.9352   1.0000
+{txt}zHealth~2019 {c |}{res}   0.1592  -0.8484   0.9253   0.9013   1.0000
+{txt}zEducat~2019 {c |}{res}   0.1885  -0.8311   0.8728   0.8045   0.8384   1.0000
+{txt}zAccess~2019 {c |}{res}   0.7102  -0.1809   0.0519   0.0221  -0.0050   0.0520   1.0000
+{txt}zHousin~2019 {c |}{res}   0.1839  -0.4333   0.2298   0.1762   0.2074   0.2140   0.2604   1.0000
+{txt}zCommun~2019 {c |}{res}  -0.0753  -0.6290   0.6045   0.5957   0.5562   0.5655  -0.1014   0.2621   1.0000
+{txt}Physic~e2019 {c |}{res}  -0.3131  -0.1963   0.1257   0.0793   0.1260   0.1141  -0.1951   0.2512   0.2528   1.0000
+
+{txt}
+{com}.    
+. *******************
+. 
+. 
+. lasso linear zfd  zIncome_Score2019 zEmployment_Score2019 zHealth_Score2019 zEducation_Score2019 zAccessServices_Score2019 zHousing_Score2019 zCommunitySafety_Score2019 zPhysicalEnvironment_Score2019 if sample_LASSO_WALES==1 & nation=="Wales", rseed(1234)
+{res}
+{res}10{txt}-fold cross-validation with {res}100 {txt}lambdas ...
+{txt}Grid value {res}1{txt}:{col 19}{txt}lambda ={res} .8986027{txt}{space 3}no. of nonzero coef. = {res}0
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} 1.584617
+{txt}Grid value {res}2{txt}:{col 19}{txt}lambda ={res} .8187733{txt}{space 3}no. of nonzero coef. = {res}1
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res}  1.46236
+{txt}Grid value {res}3{txt}:{col 19}{txt}lambda ={res} .7460357{txt}{space 3}no. of nonzero coef. = {res}1
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} 1.347067
+{txt}Grid value {res}4{txt}:{col 19}{txt}lambda ={res}   .67976{txt}{space 3}no. of nonzero coef. = {res}1
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res}  1.25134
+{txt}Grid value {res}5{txt}:{col 19}{txt}lambda ={res}  .619372{txt}{space 3}no. of nonzero coef. = {res}1
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} 1.171857
+{txt}Grid value {res}6{txt}:{col 19}{txt}lambda ={res} .5643487{txt}{space 3}no. of nonzero coef. = {res}1
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} 1.105861
+{txt}Grid value {res}7{txt}:{col 19}{txt}lambda ={res} .5142135{txt}{space 3}no. of nonzero coef. = {res}1
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} 1.051063
+{txt}Grid value {res}8{txt}:{col 19}{txt}lambda ={res} .4685322{txt}{space 3}no. of nonzero coef. = {res}1
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} 1.005563
+{txt}Grid value {res}9{txt}:{col 19}{txt}lambda ={res} .4269091{txt}{space 3}no. of nonzero coef. = {res}1
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .9677816
+{txt}Grid value {res}10{txt}:{col 19}{txt}lambda ={res} .3889836{txt}{space 3}no. of nonzero coef. = {res}1
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .9364098
+{txt}Grid value {res}11{txt}:{col 19}{txt}lambda ={res} .3544274{txt}{space 3}no. of nonzero coef. = {res}1
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .9103595
+{txt}Grid value {res}12{txt}:{col 19}{txt}lambda ={res} .3229411{txt}{space 3}no. of nonzero coef. = {res}1
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .8887277
+{txt}Grid value {res}13{txt}:{col 19}{txt}lambda ={res} .2942519{txt}{space 3}no. of nonzero coef. = {res}1
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .8703343
+{txt}Grid value {res}14{txt}:{col 19}{txt}lambda ={res} .2681113{txt}{space 3}no. of nonzero coef. = {res}3
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .8468744
+{txt}Grid value {res}15{txt}:{col 19}{txt}lambda ={res} .2442931{txt}{space 3}no. of nonzero coef. = {res}3
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .8152162
+{txt}Grid value {res}16{txt}:{col 19}{txt}lambda ={res} .2225907{txt}{space 3}no. of nonzero coef. = {res}3
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .7870119
+{txt}Grid value {res}17{txt}:{col 19}{txt}lambda ={res} .2028164{txt}{space 3}no. of nonzero coef. = {res}3
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res}   .76359
+{txt}Grid value {res}18{txt}:{col 19}{txt}lambda ={res} .1847987{txt}{space 3}no. of nonzero coef. = {res}3
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res}  .744139
+{txt}Grid value {res}19{txt}:{col 19}{txt}lambda ={res} .1683817{txt}{space 3}no. of nonzero coef. = {res}3
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .7279852
+{txt}Grid value {res}20{txt}:{col 19}{txt}lambda ={res} .1534232{txt}{space 3}no. of nonzero coef. = {res}3
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .7145694
+{txt}Grid value {res}21{txt}:{col 19}{txt}lambda ={res} .1397935{txt}{space 3}no. of nonzero coef. = {res}3
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res}  .703427
+{txt}Grid value {res}22{txt}:{col 19}{txt}lambda ={res} .1273746{txt}{space 3}no. of nonzero coef. = {res}3
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .6941392
+{txt}Grid value {res}23{txt}:{col 19}{txt}lambda ={res}  .116059{txt}{space 3}no. of nonzero coef. = {res}4
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .6850264
+{txt}Grid value {res}24{txt}:{col 19}{txt}lambda ={res} .1057486{txt}{space 3}no. of nonzero coef. = {res}4
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .6734377
+{txt}Grid value {res}25{txt}:{col 19}{txt}lambda ={res} .0963542{txt}{space 3}no. of nonzero coef. = {res}4
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .6625937
+{txt}Grid value {res}26{txt}:{col 19}{txt}lambda ={res} .0877944{txt}{space 3}no. of nonzero coef. = {res}4
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .6535818
+{txt}Grid value {res}27{txt}:{col 19}{txt}lambda ={res}  .079995{txt}{space 3}no. of nonzero coef. = {res}4
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .6461583
+{txt}Grid value {res}28{txt}:{col 19}{txt}lambda ={res} .0728884{txt}{space 3}no. of nonzero coef. = {res}4
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .6401277
+{txt}Grid value {res}29{txt}:{col 19}{txt}lambda ={res} .0664132{txt}{space 3}no. of nonzero coef. = {res}5
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .6350642
+{txt}Grid value {res}30{txt}:{col 19}{txt}lambda ={res} .0605133{txt}{space 3}no. of nonzero coef. = {res}5
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .6301611
+{txt}Grid value {res}31{txt}:{col 19}{txt}lambda ={res} .0551374{txt}{space 3}no. of nonzero coef. = {res}5
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .6256623
+{txt}Grid value {res}32{txt}:{col 19}{txt}lambda ={res} .0502392{txt}{space 3}no. of nonzero coef. = {res}5
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .6218676
+{txt}Grid value {res}33{txt}:{col 19}{txt}lambda ={res} .0457761{txt}{space 3}no. of nonzero coef. = {res}5
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .6187129
+{txt}Grid value {res}34{txt}:{col 19}{txt}lambda ={res} .0417094{txt}{space 3}no. of nonzero coef. = {res}5
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res}   .61609
+{txt}Grid value {res}35{txt}:{col 19}{txt}lambda ={res} .0380041{txt}{space 3}no. of nonzero coef. = {res}5
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .6139088
+{txt}Grid value {res}36{txt}:{col 19}{txt}lambda ={res} .0346279{txt}{space 3}no. of nonzero coef. = {res}5
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .6120946
+{txt}Grid value {res}37{txt}:{col 19}{txt}lambda ={res} .0315517{txt}{space 3}no. of nonzero coef. = {res}5
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .6105856
+{txt}Grid value {res}38{txt}:{col 19}{txt}lambda ={res} .0287487{txt}{space 3}no. of nonzero coef. = {res}5
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res}   .60933
+{txt}Grid value {res}39{txt}:{col 19}{txt}lambda ={res} .0261947{txt}{space 3}no. of nonzero coef. = {res}5
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .6082852
+{txt}Grid value {res}40{txt}:{col 19}{txt}lambda ={res} .0238677{txt}{space 3}no. of nonzero coef. = {res}6
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .6071732
+{txt}Grid value {res}41{txt}:{col 19}{txt}lambda ={res} .0217473{txt}{space 3}no. of nonzero coef. = {res}6
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .6047597
+{txt}Grid value {res}42{txt}:{col 19}{txt}lambda ={res} .0198154{txt}{space 3}no. of nonzero coef. = {res}6
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res}  .602412
+{txt}Grid value {res}43{txt}:{col 19}{txt}lambda ={res}  .018055{txt}{space 3}no. of nonzero coef. = {res}6
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .6004617
+{txt}Grid value {res}44{txt}:{col 19}{txt}lambda ={res} .0164511{txt}{space 3}no. of nonzero coef. = {res}6
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .5988972
+{txt}Grid value {res}45{txt}:{col 19}{txt}lambda ={res} .0149896{txt}{space 3}no. of nonzero coef. = {res}6
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .5976869
+{txt}Grid value {res}46{txt}:{col 19}{txt}lambda ={res}  .013658{txt}{space 3}no. of nonzero coef. = {res}6
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .5967801
+{txt}Grid value {res}47{txt}:{col 19}{txt}lambda ={res} .0124446{txt}{space 3}no. of nonzero coef. = {res}6
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .5960516
+{txt}Grid value {res}48{txt}:{col 19}{txt}lambda ={res} .0113391{txt}{space 3}no. of nonzero coef. = {res}7
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .5954416
+{txt}Grid value {res}49{txt}:{col 19}{txt}lambda ={res} .0103317{txt}{space 3}no. of nonzero coef. = {res}7
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .5948554
+{txt}Grid value {res}50{txt}:{col 19}{txt}lambda ={res} .0094139{txt}{space 3}no. of nonzero coef. = {res}7
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .5943216
+{txt}Grid value {res}51{txt}:{col 19}{txt}lambda ={res} .0085776{txt}{space 3}no. of nonzero coef. = {res}7
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res}  .593914
+{txt}Grid value {res}52{txt}:{col 19}{txt}lambda ={res} .0078156{txt}{space 3}no. of nonzero coef. = {res}7
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .5935321
+{txt}Grid value {res}53{txt}:{col 19}{txt}lambda ={res} .0071213{txt}{space 3}no. of nonzero coef. = {res}7
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res}  .593133
+{txt}Grid value {res}54{txt}:{col 19}{txt}lambda ={res} .0064886{txt}{space 3}no. of nonzero coef. = {res}7
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .5927792
+{txt}Grid value {res}55{txt}:{col 19}{txt}lambda ={res} .0059122{txt}{space 3}no. of nonzero coef. = {res}7
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .5924864
+{txt}Grid value {res}56{txt}:{col 19}{txt}lambda ={res}  .005387{txt}{space 3}no. of nonzero coef. = {res}7
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res}  .592254
+{txt}Grid value {res}57{txt}:{col 19}{txt}lambda ={res} .0049084{txt}{space 3}no. of nonzero coef. = {res}7
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .5920714
+{txt}Grid value {res}58{txt}:{col 19}{txt}lambda ={res} .0044724{txt}{space 3}no. of nonzero coef. = {res}7
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .5919472
+{txt}Grid value {res}59{txt}:{col 19}{txt}lambda ={res} .0040751{txt}{space 3}no. of nonzero coef. = {res}7
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .5918587
+{txt}Grid value {res}60{txt}:{col 19}{txt}lambda ={res}  .003713{txt}{space 3}no. of nonzero coef. = {res}7
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .5918048
+{txt}Grid value {res}61{txt}:{col 19}{txt}lambda ={res} .0033832{txt}{space 3}no. of nonzero coef. = {res}7
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .5917681
+{txt}Grid value {res}62{txt}:{col 19}{txt}lambda ={res} .0030826{txt}{space 3}no. of nonzero coef. = {res}7
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .5917432
+{txt}Grid value {res}63{txt}:{col 19}{txt}lambda ={res} .0028088{txt}{space 3}no. of nonzero coef. = {res}7
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .5917275
+{txt}Grid value {res}64{txt}:{col 19}{txt}lambda ={res} .0025593{txt}{space 3}no. of nonzero coef. = {res}7
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .5917191
+{txt}Grid value {res}65{txt}:{col 19}{txt}lambda ={res} .0023319{txt}{space 3}no. of nonzero coef. = {res}7
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .5917212
+{txt}Grid value {res}66{txt}:{col 19}{txt}lambda ={res} .0021247{txt}{space 3}no. of nonzero coef. = {res}7
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .5917294
+{txt}Grid value {res}67{txt}:{col 19}{txt}lambda ={res}  .001936{txt}{space 3}no. of nonzero coef. = {res}7
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .5917402
+{txt}Grid value {res}68{txt}:{col 19}{txt}lambda ={res}  .001764{txt}{space 3}no. of nonzero coef. = {res}7
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .5917529
+{txt}Grid value {res}69{txt}:{col 19}{txt}lambda ={res} .0016073{txt}{space 3}no. of nonzero coef. = {res}7
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .5917669
+{txt}Grid value {res}70{txt}:{col 19}{txt}lambda ={res} .0014645{txt}{space 3}no. of nonzero coef. = {res}7
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .5917833
+{txt}Grid value {res}71{txt}:{col 19}{txt}lambda ={res} .0013344{txt}{space 3}no. of nonzero coef. = {res}7
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .5918015
+{txt}Grid value {res}72{txt}:{col 19}{txt}lambda ={res} .0012159{txt}{space 3}no. of nonzero coef. = {res}7
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .5918194
+{txt}Grid value {res}73{txt}:{col 19}{txt}lambda ={res} .0011078{txt}{space 3}no. of nonzero coef. = {res}7
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .5918369
+{txt}Grid value {res}74{txt}:{col 19}{txt}lambda ={res} .0010094{txt}{space 3}no. of nonzero coef. = {res}7
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .5918537
+{txt}... change in deviance stopping tolerance reached ... last lambda selected
+{res}{txt}
+Lasso linear {txt}model{txt}{col 45}No. of obs{col 63}={res}        955
+{txt}{col 45}No. of covariates{col 63}={res}          8
+{txt}Selection: Cross-validation{txt}{col 45}No. of CV folds{col 63}={res}         10
+
+{txt}{hline 9}{c TT}{hline 17}{hline 11}{hline 10}{hline 13}{hline 13}
+{col 10}{c |}{col 39}    No. of{col 49}      Out-of-{col 62}      CV mean
+{col 10}{c |}{col 39}   nonzero{col 49}       sample{col 62}   prediction
+{col 1}      ID{col 10}{c |}     Description{col 28}     lambda{col 39}     coef.{col 49}    R-squared{col 62}        error
+{hline 9}{c +}{hline 17}{hline 11}{hline 10}{hline 13}{hline 13}
+{col 1}       1{col 10}{c |}    first lambda{col 28}{res}{space 2} .8986027{col 39}{space 1}        0{col 49}{space 6} 0.0022{col 62}{space 4} 1.584617
+{col 1}{txt}      63{col 10}{c |}   lambda before{col 28}{res}{space 2} .0028088{col 39}{space 1}        7{col 49}{space 6} 0.6274{col 62}{space 4} .5917275
+{col 1}{txt}    * 64{col 10}{c |} selected lambda{col 28}{res}{space 2} .0025593{col 39}{space 1}        7{col 49}{space 6} 0.6274{col 62}{space 4} .5917191
+{col 1}{txt}      65{col 10}{c |}    lambda after{col 28}{res}{space 2} .0023319{col 39}{space 1}        7{col 49}{space 6} 0.6274{col 62}{space 4} .5917212
+{col 1}{txt}      74{col 10}{c |}     last lambda{col 28}{res}{space 2} .0010094{col 39}{space 1}        7{col 49}{space 6} 0.6273{col 62}{space 4} .5918537
+{txt}{hline 9}{c BT}{hline 17}{hline 11}{hline 10}{hline 13}{hline 13}
+* lambda selected by cross-validation.
+
+{com}. 
+. 
+. cvplot 
+{res}{txt}
+{com}. graph save "E:\16GBBACKUPUSB\BACKUP_USB_SEPTEMBER2014\May Baydoun_folder\UK_BIOBANK_PROJECT\UKB_PAPER20_ADI_FOODESERT\DATA\LASSO_WALES_CV.gph",replace
+{res}{txt}file {bf:E:\16GBBACKUPUSB\BACKUP_USB_SEPTEMBER2014\May Baydoun_folder\UK_BIOBANK_PROJECT\UKB_PAPER20_ADI_FOODESERT\DATA\LASSO_WALES_CV.gph} saved
+
+{com}. 
+. estimates store cvWALES
+{res}{txt}
+{com}. 
+. lassoknots, display(nonzero osr2 bic)
+{res}
+{txt}{hline 7}{c TT}{hline 9}{hline 11}{hline 12}{hline 11}
+{col 8}{c |}{col 18}     No. of{col 29}     Out-of-
+{col 8}{c |}{col 18}    nonzero{col 29}      sample
+{col 1}    ID{col 8}{c |}   lambda{col 18}      coef.{col 29}   R-squared{col 41}        BIC
+{hline 7}{c +}{hline 9}{hline 11}{hline 12}{hline 11}
+{col 1}     2{col 8}{c |}{res} .8187733{col 18}{space 4}      1{col 29}{space 5} 0.0792{col 41}{space 2} 3079.407
+{col 1}{txt}    14{col 8}{c |}{res} .2681113{col 18}{space 4}      3{col 29}{space 5} 0.4667{col 41}{space 2} 2572.237
+{col 1}{txt}    23{col 8}{c |}{res}  .116059{col 18}{space 4}      4{col 29}{space 5} 0.5687{col 41}{space 2} 2374.031
+{col 1}{txt}    29{col 8}{c |}{res} .0664132{col 18}{space 4}      5{col 29}{space 5} 0.6001{col 41}{space 2}  2306.55
+{col 1}{txt}    40{col 8}{c |}{res} .0238677{col 18}{space 4}      6{col 29}{space 5} 0.6177{col 41}{space 2} 2270.994
+{col 1}{txt}    48{col 8}{c |}{res} .0113391{col 18}{space 4}      7{col 29}{space 5} 0.6251{col 41}{space 2} 2257.452
+{col 1}{txt}  * 64{col 8}{c |}{res} .0025593{col 18}{space 4}      7{col 29}{space 5} 0.6274{col 41}{space 2}  2249.33
+{col 1}{txt}    74{col 8}{c |}{res} .0010094{col 18}{space 4}      7{col 29}{space 5} 0.6273{col 41}{space 2} 2248.961
+{txt}{hline 7}{c BT}{hline 9}{hline 11}{hline 12}{hline 11}
+* lambda selected by cross-validation.
+
+{com}. 
+. lassoselect id=64
+{res}{txt}{bf:ID} = {res}64  {txt}lambda = {res}.0025593 {txt}selected
+
+{com}. 
+. cvplot
+{res}{txt}
+{com}. 
+. estimates store minBICWALES
+{res}{txt}
+{com}. 
+. graph save "E:\16GBBACKUPUSB\BACKUP_USB_SEPTEMBER2014\May Baydoun_folder\UK_BIOBANK_PROJECT\UKB_PAPER20_ADI_FOODESERT\DATA\LASSO_WALES_MINBIC.gph",replace
+{res}{txt}file {bf:E:\16GBBACKUPUSB\BACKUP_USB_SEPTEMBER2014\May Baydoun_folder\UK_BIOBANK_PROJECT\UKB_PAPER20_ADI_FOODESERT\DATA\LASSO_WALES_MINBIC.gph} saved
+
+{com}. 
+. 
+. lasso linear zIncome_Score2019 zEmployment_Score2019 zHealth_Score2019 zEducation_Score2019 zAccessServices_Score2019 zHousing_Score2019 zCommunitySafety_Score2019 zPhysicalEnvironment_Score2019 if sample_LASSO_WALES==1 & country=="Wales", rseed(1234) selection(adaptive)
+{res}
+{p 0 2 2}
+{txt}Lasso step {res}1{txt} of {res}2{txt}:
+{p_end}
+{res}
+{res}10{txt}-fold cross-validation with {res}100 {txt}lambdas ...
+{txt}Grid value {res}1{txt}:{col 19}{txt}lambda ={res} .9613805{txt}{space 3}no. of nonzero coef. = {res}0
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} 1.042674
+{txt}Grid value {res}2{txt}:{col 19}{txt}lambda ={res} .8759741{txt}{space 3}no. of nonzero coef. = {res}2
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .8919932
+{txt}Grid value {res}3{txt}:{col 19}{txt}lambda ={res}  .798155{txt}{space 3}no. of nonzero coef. = {res}2
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .7556523
+{txt}Grid value {res}4{txt}:{col 19}{txt}lambda ={res} .7272491{txt}{space 3}no. of nonzero coef. = {res}2
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .6417109
+{txt}Grid value {res}5{txt}:{col 19}{txt}lambda ={res} .6626423{txt}{space 3}no. of nonzero coef. = {res}2
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .5471161
+{txt}Grid value {res}6{txt}:{col 19}{txt}lambda ={res}  .603775{txt}{space 3}no. of nonzero coef. = {res}2
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .4685833
+{txt}Grid value {res}7{txt}:{col 19}{txt}lambda ={res} .5501373{txt}{space 3}no. of nonzero coef. = {res}2
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .4033852
+{txt}Grid value {res}8{txt}:{col 19}{txt}lambda ={res} .5012646{txt}{space 3}no. of nonzero coef. = {res}3
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .3487261
+{txt}Grid value {res}9{txt}:{col 19}{txt}lambda ={res} .4567336{txt}{space 3}no. of nonzero coef. = {res}3
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .3012553
+{txt}Grid value {res}10{txt}:{col 19}{txt}lambda ={res} .4161587{txt}{space 3}no. of nonzero coef. = {res}3
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .2618102
+{txt}Grid value {res}11{txt}:{col 19}{txt}lambda ={res} .3791883{txt}{space 3}no. of nonzero coef. = {res}3
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .2290624
+{txt}Grid value {res}12{txt}:{col 19}{txt}lambda ={res} .3455022{txt}{space 3}no. of nonzero coef. = {res}3
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .2018747
+{txt}Grid value {res}13{txt}:{col 19}{txt}lambda ={res} .3148088{txt}{space 3}no. of nonzero coef. = {res}3
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .1793031
+{txt}Grid value {res}14{txt}:{col 19}{txt}lambda ={res}  .286842{txt}{space 3}no. of nonzero coef. = {res}3
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .1605639
+{txt}Grid value {res}15{txt}:{col 19}{txt}lambda ={res} .2613598{txt}{space 3}no. of nonzero coef. = {res}3
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .1450064
+{txt}Grid value {res}16{txt}:{col 19}{txt}lambda ={res} .2381413{txt}{space 3}no. of nonzero coef. = {res}3
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .1320904
+{txt}Grid value {res}17{txt}:{col 19}{txt}lambda ={res} .2169855{txt}{space 3}no. of nonzero coef. = {res}3
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .1213674
+{txt}Grid value {res}18{txt}:{col 19}{txt}lambda ={res} .1977091{txt}{space 3}no. of nonzero coef. = {res}3
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .1124651
+{txt}Grid value {res}19{txt}:{col 19}{txt}lambda ={res} .1801452{txt}{space 3}no. of nonzero coef. = {res}3
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .1050742
+{txt}Grid value {res}20{txt}:{col 19}{txt}lambda ={res} .1641416{txt}{space 3}no. of nonzero coef. = {res}3
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .0989383
+{txt}Grid value {res}21{txt}:{col 19}{txt}lambda ={res} .1495597{txt}{space 3}no. of nonzero coef. = {res}3
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .0938442
+{txt}Grid value {res}22{txt}:{col 19}{txt}lambda ={res} .1362732{txt}{space 3}no. of nonzero coef. = {res}3
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .0896151
+{txt}Grid value {res}23{txt}:{col 19}{txt}lambda ={res} .1241671{txt}{space 3}no. of nonzero coef. = {res}3
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res}  .086104
+{txt}Grid value {res}24{txt}:{col 19}{txt}lambda ={res} .1131364{txt}{space 3}no. of nonzero coef. = {res}3
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .0831891
+{txt}Grid value {res}25{txt}:{col 19}{txt}lambda ={res} .1030857{txt}{space 3}no. of nonzero coef. = {res}3
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .0807692
+{txt}Grid value {res}26{txt}:{col 19}{txt}lambda ={res} .0939278{txt}{space 3}no. of nonzero coef. = {res}3
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .0787601
+{txt}Grid value {res}27{txt}:{col 19}{txt}lambda ={res} .0855835{txt}{space 3}no. of nonzero coef. = {res}3
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .0770922
+{txt}Grid value {res}28{txt}:{col 19}{txt}lambda ={res} .0779805{txt}{space 3}no. of nonzero coef. = {res}3
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .0757123
+{txt}Grid value {res}29{txt}:{col 19}{txt}lambda ={res}  .071053{txt}{space 3}no. of nonzero coef. = {res}3
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .0745777
+{txt}Grid value {res}30{txt}:{col 19}{txt}lambda ={res} .0647408{txt}{space 3}no. of nonzero coef. = {res}4
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .0736263
+{txt}Grid value {res}31{txt}:{col 19}{txt}lambda ={res} .0589894{txt}{space 3}no. of nonzero coef. = {res}4
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .0727914
+{txt}Grid value {res}32{txt}:{col 19}{txt}lambda ={res}  .053749{txt}{space 3}no. of nonzero coef. = {res}4
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .0720603
+{txt}Grid value {res}33{txt}:{col 19}{txt}lambda ={res}  .048974{txt}{space 3}no. of nonzero coef. = {res}4
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .0714573
+{txt}Grid value {res}34{txt}:{col 19}{txt}lambda ={res} .0446233{txt}{space 3}no. of nonzero coef. = {res}4
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .0709385
+{txt}Grid value {res}35{txt}:{col 19}{txt}lambda ={res} .0406591{txt}{space 3}no. of nonzero coef. = {res}4
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .0704828
+{txt}Grid value {res}36{txt}:{col 19}{txt}lambda ={res} .0370471{txt}{space 3}no. of nonzero coef. = {res}4
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res}  .070114
+{txt}Grid value {res}37{txt}:{col 19}{txt}lambda ={res} .0337559{txt}{space 3}no. of nonzero coef. = {res}4
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .0698151
+{txt}Grid value {res}38{txt}:{col 19}{txt}lambda ={res} .0307571{txt}{space 3}no. of nonzero coef. = {res}5
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .0695659
+{txt}Grid value {res}39{txt}:{col 19}{txt}lambda ={res} .0280248{txt}{space 3}no. of nonzero coef. = {res}5
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .0693569
+{txt}Grid value {res}40{txt}:{col 19}{txt}lambda ={res} .0255351{txt}{space 3}no. of nonzero coef. = {res}5
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .0691595
+{txt}Grid value {res}41{txt}:{col 19}{txt}lambda ={res} .0232666{txt}{space 3}no. of nonzero coef. = {res}5
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res}  .068993
+{txt}Grid value {res}42{txt}:{col 19}{txt}lambda ={res} .0211997{txt}{space 3}no. of nonzero coef. = {res}7
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .0688465
+{txt}Grid value {res}43{txt}:{col 19}{txt}lambda ={res} .0193164{txt}{space 3}no. of nonzero coef. = {res}7
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .0687032
+{txt}Grid value {res}44{txt}:{col 19}{txt}lambda ={res} .0176004{txt}{space 3}no. of nonzero coef. = {res}7
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .0685474
+{txt}Grid value {res}45{txt}:{col 19}{txt}lambda ={res} .0160368{txt}{space 3}no. of nonzero coef. = {res}7
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .0684125
+{txt}Grid value {res}46{txt}:{col 19}{txt}lambda ={res} .0146121{txt}{space 3}no. of nonzero coef. = {res}7
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res}  .068304
+{txt}Grid value {res}47{txt}:{col 19}{txt}lambda ={res}  .013314{txt}{space 3}no. of nonzero coef. = {res}7
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .0681942
+{txt}Grid value {res}48{txt}:{col 19}{txt}lambda ={res} .0121312{txt}{space 3}no. of nonzero coef. = {res}7
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .0680912
+{txt}Grid value {res}49{txt}:{col 19}{txt}lambda ={res} .0110535{txt}{space 3}no. of nonzero coef. = {res}7
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .0680059
+{txt}Grid value {res}50{txt}:{col 19}{txt}lambda ={res} .0100716{txt}{space 3}no. of nonzero coef. = {res}7
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .0679353
+{txt}Grid value {res}51{txt}:{col 19}{txt}lambda ={res} .0091768{txt}{space 3}no. of nonzero coef. = {res}7
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res}  .067877
+{txt}Grid value {res}52{txt}:{col 19}{txt}lambda ={res} .0083616{txt}{space 3}no. of nonzero coef. = {res}7
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .0678288
+{txt}Grid value {res}53{txt}:{col 19}{txt}lambda ={res} .0076188{txt}{space 3}no. of nonzero coef. = {res}7
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .0677889
+{txt}Grid value {res}54{txt}:{col 19}{txt}lambda ={res} .0069419{txt}{space 3}no. of nonzero coef. = {res}7
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res}  .067756
+{txt}Grid value {res}55{txt}:{col 19}{txt}lambda ={res} .0063252{txt}{space 3}no. of nonzero coef. = {res}7
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .0677288
+{txt}Grid value {res}56{txt}:{col 19}{txt}lambda ={res} .0057633{txt}{space 3}no. of nonzero coef. = {res}7
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .0677064
+{txt}Grid value {res}57{txt}:{col 19}{txt}lambda ={res} .0052513{txt}{space 3}no. of nonzero coef. = {res}7
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .0676879
+{txt}Grid value {res}58{txt}:{col 19}{txt}lambda ={res} .0047848{txt}{space 3}no. of nonzero coef. = {res}7
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .0676727
+{txt}Grid value {res}59{txt}:{col 19}{txt}lambda ={res} .0043597{txt}{space 3}no. of nonzero coef. = {res}7
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .0676601
+{txt}Grid value {res}60{txt}:{col 19}{txt}lambda ={res} .0039724{txt}{space 3}no. of nonzero coef. = {res}7
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .0676498
+{txt}Grid value {res}61{txt}:{col 19}{txt}lambda ={res} .0036195{txt}{space 3}no. of nonzero coef. = {res}7
+{txt}Folds: 1{txt}.{txt}.{txt}.{txt}5{txt}.{txt}.{txt}.{txt}.{txt}10{space 3}CVF ={res} .0676414
+{txt}... change in deviance stopping tolerance reached ... last lambda selected
+{p 0 0 2}{txt}Minimum of CV function not found; lambda selected based on {bf:stop()} stopping criterion.{p_end}
+{p 0 2 2}
+Lasso step {res}2{txt} of {res}2{txt}:
+{p_end}
+{res}
+{txt}Evaluating up to {res}100 {txt}lambdas in grid ...
+{txt}Grid value {res}1{txt}:{col 19}{txt}lambda ={res} 14.64771{txt}{space 3}no. of nonzero coef. = {res}0
+{txt}Grid value {res}2{txt}:{col 19}{txt}lambda ={res} 13.34645{txt}{space 3}no. of nonzero coef. = {res}1
+{txt}Grid value {res}3{txt}:{col 19}{txt}lambda ={res} 12.16079{txt}{space 3}no. of nonzero coef. = {res}1
+{txt}Grid value {res}4{txt}:{col 19}{txt}lambda ={res} 11.08045{txt}{space 3}no. of nonzero coef. = {res}1
+{txt}Grid value {res}5{txt}:{col 19}{txt}lambda ={res}  10.0961{txt}{space 3}no. of nonzero coef. = {res}1
+{txt}Grid value {res}6{txt}:{col 19}{txt}lambda ={res} 9.199188{txt}{space 3}no. of nonzero coef. = {res}1
+{txt}Grid value {res}7{txt}:{col 19}{txt}lambda ={res} 8.381958{txt}{space 3}no. of nonzero coef. = {res}1
+{txt}Grid value {res}8{txt}:{col 19}{txt}lambda ={res} 7.637328{txt}{space 3}no. of nonzero coef. = {res}1
+{txt}Grid value {res}9{txt}:{col 19}{txt}lambda ={res} 6.958849{txt}{space 3}no. of nonzero coef. = {res}1
+{txt}Grid value {res}10{txt}:{col 19}{txt}lambda ={res} 6.340644{txt}{space 3}no. of nonzero coef. = {res}1
+{txt}Grid value {res}11{txt}:{col 19}{txt}lambda ={res} 5.777358{txt}{space 3}no. of nonzero coef. = {res}1
+{txt}Grid value {res}12{txt}:{col 19}{txt}lambda ={res} 5.264114{txt}{space 3}no. of nonzero coef. = {res}1
+{txt}Grid value {res}13{txt}:{col 19}{txt}lambda ={res} 4.796464{txt}{space 3}no. of nonzero coef. = {res}1
+{txt}Grid value {res}14{txt}:{col 19}{txt}lambda ={res}  4.37036{txt}{space 3}no. of nonzero coef. = {res}1
+{txt}Grid value {res}15{txt}:{col 19}{txt}lambda ={res} 3.982109{txt}{space 3}no. of nonzero coef. = {res}1
+{txt}Grid value {res}16{txt}:{col 19}{txt}lambda ={res} 3.628349{txt}{space 3}no. of nonzero coef. = {res}1
+{txt}Grid value {res}17{txt}:{col 19}{txt}lambda ={res} 3.306017{txt}{space 3}no. of nonzero coef. = {res}1
+{txt}Grid value {res}18{txt}:{col 19}{txt}lambda ={res} 3.012319{txt}{space 3}no. of nonzero coef. = {res}1
+{txt}Grid value {res}19{txt}:{col 19}{txt}lambda ={res} 2.744713{txt}{space 3}no. of nonzero coef. = {res}1
+{txt}Grid value {res}20{txt}:{col 19}{txt}lambda ={res} 2.500881{txt}{space 3}no. of nonzero coef. = {res}1
+{txt}Grid value {res}21{txt}:{col 19}{txt}lambda ={res} 2.278709{txt}{space 3}no. of nonzero coef. = {res}1
+{txt}Grid value {res}22{txt}:{col 19}{txt}lambda ={res} 2.076275{txt}{space 3}no. of nonzero coef. = {res}1
+{txt}Grid value {res}23{txt}:{col 19}{txt}lambda ={res} 1.891824{txt}{space 3}no. of nonzero coef. = {res}2
+{txt}Grid value {res}24{txt}:{col 19}{txt}lambda ={res}  1.72376{txt}{space 3}no. of nonzero coef. = {res}2
+{txt}Grid value {res}25{txt}:{col 19}{txt}lambda ={res} 1.570626{txt}{space 3}no. of nonzero coef. = {res}2
+{txt}Grid value {res}26{txt}:{col 19}{txt}lambda ={res} 1.431096{txt}{space 3}no. of nonzero coef. = {res}2
+{txt}Grid value {res}27{txt}:{col 19}{txt}lambda ={res} 1.303961{txt}{space 3}no. of nonzero coef. = {res}2
+{txt}Grid value {res}28{txt}:{col 19}{txt}lambda ={res} 1.188121{txt}{space 3}no. of nonzero coef. = {res}3
+{txt}Grid value {res}29{txt}:{col 19}{txt}lambda ={res} 1.082571{txt}{space 3}no. of nonzero coef. = {res}3
+{txt}Grid value {res}30{txt}:{col 19}{txt}lambda ={res} .9863988{txt}{space 3}no. of nonzero coef. = {res}3
+{txt}Grid value {res}31{txt}:{col 19}{txt}lambda ={res} .8987699{txt}{space 3}no. of nonzero coef. = {res}3
+{txt}Grid value {res}32{txt}:{col 19}{txt}lambda ={res} .8189256{txt}{space 3}no. of nonzero coef. = {res}3
+{txt}Grid value {res}33{txt}:{col 19}{txt}lambda ={res} .7461745{txt}{space 3}no. of nonzero coef. = {res}3
+{txt}Grid value {res}34{txt}:{col 19}{txt}lambda ={res} .6798864{txt}{space 3}no. of nonzero coef. = {res}3
+{txt}Grid value {res}35{txt}:{col 19}{txt}lambda ={res} .6194872{txt}{space 3}no. of nonzero coef. = {res}3
+{txt}Grid value {res}36{txt}:{col 19}{txt}lambda ={res} .5644537{txt}{space 3}no. of nonzero coef. = {res}3
+{txt}Grid value {res}37{txt}:{col 19}{txt}lambda ={res} .5143092{txt}{space 3}no. of nonzero coef. = {res}3
+{txt}Grid value {res}38{txt}:{col 19}{txt}lambda ={res} .4686193{txt}{space 3}no. of nonzero coef. = {res}3
+{txt}Grid value {res}39{txt}:{col 19}{txt}lambda ={res} .4269885{txt}{space 3}no. of nonzero coef. = {res}3
+{txt}Grid value {res}40{txt}:{col 19}{txt}lambda ={res}  .389056{txt}{space 3}no. of nonzero coef. = {res}3
+{txt}Grid value {res}41{txt}:{col 19}{txt}lambda ={res} .3544934{txt}{space 3}no. of nonzero coef. = {res}3
+{txt}Grid value {res}42{txt}:{col 19}{txt}lambda ={res} .3230011{txt}{space 3}no. of nonzero coef. = {res}3
+{txt}Grid value {res}43{txt}:{col 19}{txt}lambda ={res} .2943066{txt}{space 3}no. of nonzero coef. = {res}3
+{txt}Grid value {res}44{txt}:{col 19}{txt}lambda ={res} .2681612{txt}{space 3}no. of nonzero coef. = {res}3
+{txt}Grid value {res}45{txt}:{col 19}{txt}lambda ={res} .2443385{txt}{space 3}no. of nonzero coef. = {res}3
+{txt}Grid value {res}46{txt}:{col 19}{txt}lambda ={res} .2226322{txt}{space 3}no. of nonzero coef. = {res}3
+{txt}Grid value {res}47{txt}:{col 19}{txt}lambda ={res} .2028541{txt}{space 3}no. of nonzero coef. = {res}3
+{txt}Grid value {res}48{txt}:{col 19}{txt}lambda ={res} .1848331{txt}{space 3}no. of nonzero coef. = {res}3
+{txt}Grid value {res}49{txt}:{col 19}{txt}lambda ={res} .1684131{txt}{space 3}no. of nonzero coef. = {res}3
+{txt}Grid value {res}50{txt}:{col 19}{txt}lambda ={res} .1534517{txt}{space 3}no. of nonzero coef. = {res}3
+{txt}Grid value {res}51{txt}:{col 19}{txt}lambda ={res} .1398195{txt}{space 3}no. of nonzero coef. = {res}3
+{txt}Grid value {res}52{txt}:{col 19}{txt}lambda ={res} .1273983{txt}{space 3}no. of nonzero coef. = {res}3
+{txt}Grid value {res}53{txt}:{col 19}{txt}lambda ={res} .1160806{txt}{space 3}no. of nonzero coef. = {res}3
+{txt}Grid value {res}54{txt}:{col 19}{txt}lambda ={res} .1057683{txt}{space 3}no. of nonzero coef. = {res}3
+{txt}Grid value {res}55{txt}:{col 19}{txt}lambda ={res} .0963721{txt}{space 3}no. of nonzero coef. = {res}3
+{txt}Grid value {res}56{txt}:{col 19}{txt}lambda ={res} .0878107{txt}{space 3}no. of nonzero coef. = {res}3
+{txt}Grid value {res}57{txt}:{col 19}{txt}lambda ={res} .0800098{txt}{space 3}no. of nonzero coef. = {res}3
+{txt}Grid value {res}58{txt}:{col 19}{txt}lambda ={res}  .072902{txt}{space 3}no. of nonzero coef. = {res}3
+{txt}Grid value {res}59{txt}:{col 19}{txt}lambda ={res} .0664256{txt}{space 3}no. of nonzero coef. = {res}3
+{txt}Grid value {res}60{txt}:{col 19}{txt}lambda ={res} .0605245{txt}{space 3}no. of nonzero coef. = {res}3
+{txt}Grid value {res}61{txt}:{col 19}{txt}lambda ={res} .0551477{txt}{space 3}no. of nonzero coef. = {res}3
+{txt}Grid value {res}62{txt}:{col 19}{txt}lambda ={res} .0502485{txt}{space 3}no. of nonzero coef. = {res}3
+{txt}Grid value {res}63{txt}:{col 19}{txt}lambda ={res} .0457846{txt}{space 3}no. of nonzero coef. = {res}3
+{txt}Grid value {res}64{txt}:{col 19}{txt}lambda ={res} .0417172{txt}{space 3}no. of nonzero coef. = {res}3
+{txt}... change in deviance stopping tolerance reached
+
+{res}10{txt}-fold cross-validation with {res}64 {txt}lambdas ...
+{txt}Fold {res} 1 {txt}of {res}10:{col 17}{col 17}{txt}10{txt}.{txt}.{txt}.{txt}.{txt}20{txt}.{txt}.{txt}.{txt}.{txt}30{txt}.{txt}.{txt}.{txt}.{txt}40{txt}.{txt}.{txt}.{txt}.{txt}50{txt}.{txt}.{txt}.{txt}.{txt}60{txt}.{txt}.
+{txt}Fold {res} 2 {txt}of {res}10:{col 17}{col 17}{txt}10{txt}.{txt}.{txt}.{txt}.{txt}20{txt}.{txt}.{txt}.{txt}.{txt}30{txt}.{txt}.{txt}.{txt}.{txt}40{txt}.{txt}.{txt}.{txt}.{txt}50{txt}.{txt}.{txt}.{txt}.{txt}60{txt}.{txt}.
+{txt}Fold {res} 3 {txt}of {res}10:{col 17}{col 17}{txt}10{txt}.{txt}.{txt}.{txt}.{txt}20{txt}.{txt}.{txt}.{txt}.{txt}30{txt}.{txt}.{txt}.{txt}.{txt}40{txt}.{txt}.{txt}.{txt}.{txt}50{txt}.{txt}.{txt}.{txt}.{txt}60{txt}.{txt}.
+{txt}Fold {res} 4 {txt}of {res}10:{col 17}{col 17}{txt}10{txt}.{txt}.{txt}.{txt}.{txt}20{txt}.{txt}.{txt}.{txt}.{txt}30{txt}.{txt}.{txt}.{txt}.{txt}40{txt}.{txt}.{txt}.{txt}.{txt}50{txt}.{txt}.{txt}.{txt}.{txt}60{txt}.{txt}.
+{txt}Fold {res} 5 {txt}of {res}10:{col 17}{col 17}{txt}10{txt}.{txt}.{txt}.{txt}.{txt}20{txt}.{txt}.{txt}.{txt}.{txt}30{txt}.{txt}.{txt}.{txt}.{txt}40{txt}.{txt}.{txt}.{txt}.{txt}50{txt}.{txt}.{txt}.{txt}.{txt}60{txt}.{txt}.
+{txt}Fold {res} 6 {txt}of {res}10:{col 17}{col 17}{txt}10{txt}.{txt}.{txt}.{txt}.{txt}20{txt}.{txt}.{txt}.{txt}.{txt}30{txt}.{txt}.{txt}.{txt}.{txt}40{txt}.{txt}.{txt}.{txt}.{txt}50{txt}.{txt}.{txt}.{txt}.{txt}60{txt}.{txt}.
+{txt}Fold {res} 7 {txt}of {res}10:{col 17}{col 17}{txt}10{txt}.{txt}.{txt}.{txt}.{txt}20{txt}.{txt}.{txt}.{txt}.{txt}30{txt}.{txt}.{txt}.{txt}.{txt}40{txt}.{txt}.{txt}.{txt}.{txt}50{txt}.{txt}.{txt}.{txt}.{txt}60{txt}.{txt}.
+{txt}Fold {res} 8 {txt}of {res}10:{col 17}{col 17}{txt}10{txt}.{txt}.{txt}.{txt}.{txt}20{txt}.{txt}.{txt}.{txt}.{txt}30{txt}.{txt}.{txt}.{txt}.{txt}40{txt}.{txt}.{txt}.{txt}.{txt}50{txt}.{txt}.{txt}.{txt}.{txt}60{txt}.{txt}.
+{txt}Fold {res} 9 {txt}of {res}10:{col 17}{col 17}{txt}10{txt}.{txt}.{txt}.{txt}.{txt}20{txt}.{txt}.{txt}.{txt}.{txt}30{txt}.{txt}.{txt}.{txt}.{txt}40{txt}.{txt}.{txt}.{txt}.{txt}50{txt}.{txt}.{txt}.{txt}.{txt}60{txt}.{txt}.
+{txt}Fold {res}10 {txt}of {res}10:{col 17}{col 17}{txt}10{txt}.{txt}.{txt}.{txt}.{txt}20{txt}.{txt}.{txt}.{txt}.{txt}30{txt}.{txt}.{txt}.{txt}.{txt}40{txt}.{txt}.{txt}.{txt}.{txt}50{txt}.{txt}.{txt}.{txt}.{txt}60{txt}.{txt}.
+... cross-validation complete
+{res}{txt}
+Lasso linear {txt}model{txt}{col 44}No. of obs{col 63}={res}        955
+{txt}{col 44}No. of covariates{col 63}={res}          7
+{txt}Selection: Adaptive{txt}{col 44}No. of lasso steps{col 63}={res}          2
+
+{txt}Final adaptive step results
+{hline 9}{c TT}{hline 17}{hline 11}{hline 10}{hline 13}{hline 13}
+{col 10}{c |}{col 39}    No. of{col 49}      Out-of-{col 62}      CV mean
+{col 10}{c |}{col 39}   nonzero{col 49}       sample{col 62}   prediction
+{col 1}      ID{col 10}{c |}     Description{col 28}     lambda{col 39}     coef.{col 49}    R-squared{col 62}        error
+{hline 9}{c +}{hline 17}{hline 11}{hline 10}{hline 13}{hline 13}
+{col 1}      62{col 10}{c |}    first lambda{col 28}{res}{space 2} 14.64771{col 39}{space 1}        0{col 49}{space 6} 0.0030{col 62}{space 4} 1.042674
+{col 1}{txt}     124{col 10}{c |}   lambda before{col 28}{res}{space 2} .0457846{col 39}{space 1}        3{col 49}{space 6} 0.9340{col 62}{space 4} .0689937
+{col 1}{txt}   * 125{col 10}{c |} selected lambda{col 28}{res}{space 2} .0417172{col 39}{space 1}        3{col 49}{space 6} 0.9340{col 62}{space 4} .0689845
+{txt}{hline 9}{c BT}{hline 17}{hline 11}{hline 10}{hline 13}{hline 13}
+* lambda selected by cross-validation in final adaptive step.
+
+{com}. 
+. cvplot
+{res}{txt}
+{com}. 
+. estimates store adaptiveWALES
+{res}{txt}
+{com}. 
+. 
+. graph save "E:\16GBBACKUPUSB\BACKUP_USB_SEPTEMBER2014\May Baydoun_folder\UK_BIOBANK_PROJECT\UKB_PAPER20_ADI_FOODESERT\DATA\LASSO_WALES_ADAPTIVE.gph",replace
+{res}{txt}file {bf:E:\16GBBACKUPUSB\BACKUP_USB_SEPTEMBER2014\May Baydoun_folder\UK_BIOBANK_PROJECT\UKB_PAPER20_ADI_FOODESERT\DATA\LASSO_WALES_ADAPTIVE.gph} saved
+
+{com}. 
+. 
+. lassocoef cvWALES minBICWALES adaptiveWALES, sort(coef, standardized) nofvlabel
+{res}
+{txt}{hline 31}{c TT}{hline 10}{hline 13}{hline 15}
+{col 32}{c |}  cvWALES {col 43} minBICWALES {col 56} adaptiveWALES 
+{hline 31}{c +}{hline 10}{hline 13}{hline 15}
+{space 5}zAccessServices_Score2019 {c |}{col 32}     x    {col 43}      x      
+{space 9}zEmployment_Score2019 {c |}{col 32}     x    {col 43}      x      {col 56}       x       
+{space 13}zHealth_Score2019 {c |}{col 32}     x    {col 43}      x      {col 56}       x       
+{space 4}zCommunitySafety_Score2019 {c |}{col 32}     x    {col 43}      x      
+zPhysicalEnvironment_Score2019 {c |}{col 32}     x    {col 43}      x      
+{space 13}zIncome_Score2019 {c |}{col 32}     x    {col 43}      x      
+{space 12}zHousing_Score2019 {c |}{col 32}     x    {col 43}      x      
+{space 10}zEducation_Score2019 {c |}{col 32}{col 56}       x       
+{space 25}_cons {c |}{col 32}     x    {col 43}      x      {col 56}       x       
+{hline 31}{c BT}{hline 10}{hline 13}{hline 15}
+Legend:
+  b - base level
+  e - empty cell
+  o - omitted
+  x - estimated
+
+{com}.  
+. 
+. **----------------------------------------------------------------------
+. **                               |  cvWALES  minBICWALES  adaptiveWALES 
+. **-------------------------------+--------------------------------------
+. **     zAccessServices_Score2019 |     x          x      
+. **         zEmployment_Score2019 |     x          x             x       
+. **             zHealth_Score2019 |     x          x             x       
+. **    zCommunitySafety_Score2019 |     x          x      
+. **zPhysicalEnvironment_Score2019 |     x          x      
+. **             zIncome_Score2019 |     x          x      
+. **            zHousing_Score2019 |     x          x      
+. **          zEducation_Score2019 |                              x       
+. **                         _cons |     x          x             x       
+. **----------------------------------------------------------------------
+. 
+.  
+. lassogof cvWALES minBICWALES adaptiveWALES, over(sample_LASSO_WALES) postselection
+{res}
+{txt}Postselection coefficients
+{hline 12}{hline 12}{c TT}{hline 12}{hline 13}{hline 11}
+{col 1}Name        {col 13} sample_L~S{col 25}{c |}         MSE{col 38}    R-squared{col 51}        Obs
+{hline 12}{hline 12}{c +}{hline 12}{hline 13}{hline 11}
+{col 1}cvWALES     {col 25}{c |}
+{col 13}          1{col 25}{c |}{res}{space 3} .5824592{col 38}{space 6} 0.6332{col 51}{space 4}    955
+{col 13}{txt}          2{col 25}{c |}{res}{space 3} .6391186{col 38}{space 6} 0.6136{col 51}{space 4}    954
+{txt}{hline 12}{hline 12}{c +}{hline 12}{hline 13}{hline 11}
+{col 1}minBICWALES {col 25}{c |}
+{col 13}          1{col 25}{c |}{res}{space 3} .5824592{col 38}{space 6} 0.6332{col 51}{space 4}    955
+{col 13}{txt}          2{col 25}{c |}{res}{space 3} .6391186{col 38}{space 6} 0.6136{col 51}{space 4}    954
+{txt}{hline 12}{hline 12}{c +}{hline 12}{hline 13}{hline 11}
+{col 1}adaptiveWALES{col 25}{c |}
+{col 13}          1{col 25}{c |}{res}{space 3} .0680789{col 38}{space 6} 0.9349{col 51}{space 4}    955
+{col 13}{txt}          2{col 25}{c |}{res}{space 3} .0756418{col 38}{space 6} 0.9205{col 51}{space 4}    954
+{txt}{hline 12}{hline 12}{c BT}{hline 12}{hline 13}{hline 11}
+
+{com}. 
+. 
+. **Postselection coefficients
+. **-------------------------------------------------------------
+. **Name         sample_L~S |         MSE    R-squared        Obs
+. **------------------------+------------------------------------
+. **cvWALES                 |
+. **                      1 |    .5824592       0.6332        955
+. **                      2 |    .6391186       0.6136        954
+. **------------------------+------------------------------------
+. **minBICWALES             |
+. **                      1 |    .5824592       0.6332        955
+. **                      2 |    .6391186       0.6136        954
+. **------------------------+------------------------------------
+. **adaptiveWALES           |
+. **                      1 |    .0680789       0.9349        955
+. **                      2 |    .0756418       0.9205        954
+. **-------------------------------------------------------------
+. save "E:\16GBBACKUPUSB\BACKUP_USB_SEPTEMBER2014\May Baydoun_folder\UK_BIOBANK_PROJECT\UKB_PAPER20_ADI_FOODESERT\DATA\UK_fooddesertdatafinalizedIMD_mergedfinalized.dta",replace
+{txt}{p 0 4 2}
+file {bf}
+E:\16GBBACKUPUSB\BACKUP_USB_SEPTEMBER2014\May Baydoun_folder\UK_BIOBANK_PROJECT\UKB_PAPER20_ADI_FOODESERT\DATA\UK_fooddesertdatafinalizedIMD_mergedfinalized.dta{rm}
+saved
+{p_end}
+
+{com}. 
+. 
+. 
+. 
+. capture log close 
+{smcl}
+{com}{sf}{ul off}

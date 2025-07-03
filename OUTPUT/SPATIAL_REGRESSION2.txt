@@ -1,0 +1,47 @@
+REGRESSION
+----------
+SUMMARY OF OUTPUT: ORDINARY LEAST SQUARES ESTIMATION
+Data set            :  infuse_lsoa_lyr_2011_clipped_FD_IMDfin2
+Dependent Variable  :        zIMD  Number of Observations:42619
+Mean dependent var  :           0  Number of Variables   :    2
+S.D. dependent var  :    0.582522  Degrees of Freedom    :42617 
+
+R-squared           :    0.091441  F-statistic           :     4289.15
+Adjusted R-squared  :    0.091420  Prob(F-statistic)     :           0
+Sum squared residual:     13139.6  Log likelihood        :    -35399.5
+Sigma-square        :    0.308318  Akaike info criterion :     70802.9
+S.E. of regression  :    0.555264  Schwarz criterion     :     70820.3
+Sigma-square ML     :    0.308303
+S.E of regression ML:    0.555251
+
+-----------------------------------------------------------------------------
+       Variable      Coefficient      Std.Error    t-Statistic   Probability
+-----------------------------------------------------------------------------
+          CONSTANT   -0.00831269     0.00269265       -3.08717     0.00202
+               zFD      0.326524     0.00498574        65.4916     0.00000
+-----------------------------------------------------------------------------
+
+REGRESSION DIAGNOSTICS  
+MULTICOLLINEARITY CONDITION NUMBER   1.048304
+TEST ON NORMALITY OF ERRORS
+TEST                  DF           VALUE             PROB
+Jarque-Bera            2            63.4234          0.00000
+
+DIAGNOSTICS FOR HETEROSKEDASTICITY  
+RANDOM COEFFICIENTS
+TEST                  DF           VALUE             PROB
+Breusch-Pagan test     1            68.3463          0.00000
+Koenker-Bassett test   1            68.9346          0.00000
+
+DIAGNOSTICS FOR SPATIAL DEPENDENCE   
+FOR WEIGHT MATRIX : infuse_lsoa_lyr_2011_clipped_FD_IMDfin2
+   (row-standardized weights)
+TEST                          MI/DF        VALUE          PROB
+Moran's I (error)             0.0116        3.6320        0.00028
+Lagrange Multiplier (lag)       1          10.4404        0.00123
+Robust LM (lag)                 1           1.3954        0.23749
+Lagrange Multiplier (error)     1          13.1257        0.00029
+Robust LM (error)               1           4.0807        0.04338
+Lagrange Multiplier (SARMA)     2          14.5211        0.00070
+============================== END OF REPORT ================================
+

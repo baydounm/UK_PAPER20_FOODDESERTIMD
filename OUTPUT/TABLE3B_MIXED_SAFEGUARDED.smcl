@@ -1,0 +1,309 @@
+{smcl}
+{com}{sf}{ul off}{txt}
+{com}. 
+. ********************ENGLAND AND WALES, MIXED-MODELS WITH SAFEGARDED DATA GROUPING*****************
+. 
+. use "E:\16GBBACKUPUSB\BACKUP_USB_SEPTEMBER2014\May Baydoun_folder\UK_BIOBANK_PROJECT\UKB_PAPER20_ADI_FOODESERT\DATA\UK_fooddesertdatafinalizedIMD_mergedfinalized.dta",clear
+{txt}
+{com}. capture drop _merge
+{txt}
+{com}. sort lsoa
+{txt}
+{com}. save "E:\16GBBACKUPUSB\BACKUP_USB_SEPTEMBER2014\May Baydoun_folder\UK_BIOBANK_PROJECT\UKB_PAPER20_ADI_FOODESERT\DATA\UK_fooddesertdatafinalizedIMD_mergedfinalized.dta",replace
+{txt}{p 0 4 2}
+file {bf}
+E:\16GBBACKUPUSB\BACKUP_USB_SEPTEMBER2014\May Baydoun_folder\UK_BIOBANK_PROJECT\UKB_PAPER20_ADI_FOODESERT\DATA\UK_fooddesertdatafinalizedIMD_mergedfinalized.dta{rm}
+saved
+{p_end}
+
+{com}. 
+. 
+. clear
+{txt}
+{com}. import delimited "E:\16GBBACKUPUSB\BACKUP_USB_SEPTEMBER2014\May Baydoun_folder\UK_BIOBANK_PROJECT\UKB_PAPER20_ADI_FOODESERT\DATA\LSOA_DZ_SDZ_Lookup.csv"
+{res}{txt}(encoding automatically selected: ISO-8859-1)
+{res}{text}(4 vars, 43,914 obs)
+
+{com}. save "E:\16GBBACKUPUSB\BACKUP_USB_SEPTEMBER2014\May Baydoun_folder\UK_BIOBANK_PROJECT\UKB_PAPER20_ADI_FOODESERT\DATA\LSOA_DZ_SDZ_Lookup.dta",replace
+{txt}{p 0 4 2}
+file {bf}
+E:\16GBBACKUPUSB\BACKUP_USB_SEPTEMBER2014\May Baydoun_folder\UK_BIOBANK_PROJECT\UKB_PAPER20_ADI_FOODESERT\DATA\LSOA_DZ_SDZ_Lookup.dta{rm}
+saved
+{p_end}
+
+{com}. capture rename geography_code lsoa
+{txt}
+{com}. sort lsoa
+{txt}
+{com}. save "E:\16GBBACKUPUSB\BACKUP_USB_SEPTEMBER2014\May Baydoun_folder\UK_BIOBANK_PROJECT\UKB_PAPER20_ADI_FOODESERT\DATA\LSOA_DZ_SDZ_Lookup.dta",replace
+{txt}{p 0 4 2}
+file {bf}
+E:\16GBBACKUPUSB\BACKUP_USB_SEPTEMBER2014\May Baydoun_folder\UK_BIOBANK_PROJECT\UKB_PAPER20_ADI_FOODESERT\DATA\LSOA_DZ_SDZ_Lookup.dta{rm}
+saved
+{p_end}
+
+{com}. 
+. clear
+{txt}
+{com}. use "E:\16GBBACKUPUSB\BACKUP_USB_SEPTEMBER2014\May Baydoun_folder\UK_BIOBANK_PROJECT\UKB_PAPER20_ADI_FOODESERT\DATA\UK_fooddesertdatafinalizedIMD_mergedfinalized.dta",clear
+{txt}
+{com}. merge lsoa using "E:\16GBBACKUPUSB\BACKUP_USB_SEPTEMBER2014\May Baydoun_folder\UK_BIOBANK_PROJECT\UKB_PAPER20_ADI_FOODESERT\DATA\LSOA_DZ_SDZ_Lookup.dta"
+{txt}{p}
+(you are using old
+{bf:merge} syntax; see
+{bf:{help merge:[D] merge}} for new syntax)
+{p_end}
+{p 0 4 2}
+variable{txt} lsoa
+does not uniquely identify observations in
+the master data
+{p_end}
+
+{com}. save "E:\16GBBACKUPUSB\BACKUP_USB_SEPTEMBER2014\May Baydoun_folder\UK_BIOBANK_PROJECT\UKB_PAPER20_ADI_FOODESERT\DATA\UK_fooddesertdatafinalizedIMD_mergedfinalizedfin.dta",replace
+{txt}{p 0 4 2}
+file {bf}
+E:\16GBBACKUPUSB\BACKUP_USB_SEPTEMBER2014\May Baydoun_folder\UK_BIOBANK_PROJECT\UKB_PAPER20_ADI_FOODESERT\DATA\UK_fooddesertdatafinalizedIMD_mergedfinalizedfin.dta{rm}
+saved
+{p_end}
+
+{com}. 
+. 
+. 
+. global mainvars zinc_sc zemp_sc zed_sc zhlth_sc zcrm_sc  zhsserv_sc zlivenv_sc
+{txt}
+{com}. 
+. capture drop i_*
+{txt}
+{com}. 
+. foreach v1 in $mainvars {c -(}
+{txt}  2{com}.     foreach v2 in $mainvars {c -(}
+{txt}  3{com}.         if "`v1'" < "`v2'" {c -(}
+{txt}  4{com}.             gen i_`v1'_`v2' = `v1' * `v2'
+{txt}  5{com}.         {c )-}
+{txt}  6{com}.     {c )-}
+{txt}  7{com}. {c )-}
+{txt}(28,335 missing values generated)
+(28,335 missing values generated)
+(28,335 missing values generated)
+(28,335 missing values generated)
+(28,335 missing values generated)
+(28,335 missing values generated)
+(28,335 missing values generated)
+(26,629 missing values generated)
+(27,525 missing values generated)
+(26,629 missing values generated)
+(28,335 missing values generated)
+(27,525 missing values generated)
+(26,629 missing values generated)
+(28,335 missing values generated)
+(28,335 missing values generated)
+(28,335 missing values generated)
+(28,335 missing values generated)
+(28,335 missing values generated)
+(28,335 missing values generated)
+(28,335 missing values generated)
+(27,525 missing values generated)
+
+{com}. 
+. 
+. 
+. mixed zfd zemp_sc i_zhlth_sc_zinc_sc zinc_sc zcrm_sc i_zhsserv_sc_zinc_sc i_zed_sc_zhlth_sc i_zemp_sc_zinc_sc zed_sc zhsserv_sc i_zcrm_sc_zinc_sc i_zemp_sc_zhsserv_sc i_zed_sc_zemp_sc  i_zcrm_sc_zlivenv_sc i_zhlth_sc_zhsserv_sc i_zcrm_sc_zemp_sc i_zhsserv_sc_zlivenv_sc i_zemp_sc_zhlth_sc i_zinc_sc_zlivenv_sc zhlth_sc i_zemp_sc_zlivenv_sc i_zed_sc_zlivenv_sc i_zed_sc_zinc_sc i_zcrm_sc_zhsserv_sc zlivenv_sc i_zcrm_sc_zhlth_sc i_zhlth_sc_zlivenv_sc i_zed_sc_zhsserv_sc i_zcrm_sc_zed_sc i.supergroup  if nation=="England" || la_codenum:
+{res}
+{txt}Performing EM optimization ...
+{res}
+{txt}Performing gradient-based optimization: 
+{res}{txt}Iteration 0:{space 2}Log likelihood = {res: -23911.04}  
+Iteration 1:{space 2}Log likelihood = {res: -23911.04}  
+{res}
+{txt}Computing standard errors ...
+{res}
+{txt}Mixed-effects ML regression{col 52}Number of obs{col 68} = {res}  31,810
+{txt}Group variable: {res}la_codenum{col 52}{txt}Number of groups{col 68} = {res}     317
+{txt}{col 52}Obs per group:
+{col 65}min = {res}       1
+{txt}{col 65}avg = {res}   100.3
+{txt}{col 65}max = {res}     616
+{col 52}{txt}Wald chi2({res}35{txt}){col 68} = {res}40760.42
+{txt}Log likelihood = {res} -23911.04{col 52}{txt}Prob > chi2{col 68} = {res}  0.0000
+
+{txt}{hline 24}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1}                    zfd{col 25}{c |} Coefficient{col 37}  Std. err.{col 49}      z{col 57}   P>|z|{col 65}     [95% con{col 78}f. interval]
+{hline 24}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 16}zemp_sc {c |}{col 25}{res}{space 2} .3468562{col 37}{space 2} .0166042{col 48}{space 1}   20.89{col 57}{space 3}0.000{col 65}{space 4} .3143126{col 78}{space 3} .3793998
+{txt}{space 5}i_zhlth_sc_zinc_sc {c |}{col 25}{res}{space 2} .1847383{col 37}{space 2}  .019339{col 48}{space 1}    9.55{col 57}{space 3}0.000{col 65}{space 4} .1468345{col 78}{space 3} .2226421
+{txt}{space 16}zinc_sc {c |}{col 25}{res}{space 2}  .262684{col 37}{space 2} .0168966{col 48}{space 1}   15.55{col 57}{space 3}0.000{col 65}{space 4} .2295672{col 78}{space 3} .2958008
+{txt}{space 16}zcrm_sc {c |}{col 25}{res}{space 2}-.1519505{col 37}{space 2} .0047862{col 48}{space 1}  -31.75{col 57}{space 3}0.000{col 65}{space 4}-.1613313{col 78}{space 3}-.1425697
+{txt}{space 3}i_zhsserv_sc_zinc_sc {c |}{col 25}{res}{space 2}-.1373347{col 37}{space 2} .0112064{col 48}{space 1}  -12.26{col 57}{space 3}0.000{col 65}{space 4}-.1592988{col 78}{space 3}-.1153706
+{txt}{space 6}i_zed_sc_zhlth_sc {c |}{col 25}{res}{space 2}-.0226855{col 37}{space 2} .0130198{col 48}{space 1}   -1.74{col 57}{space 3}0.081{col 65}{space 4}-.0482038{col 78}{space 3} .0028329
+{txt}{space 6}i_zemp_sc_zinc_sc {c |}{col 25}{res}{space 2} -.098359{col 37}{space 2} .0102784{col 48}{space 1}   -9.57{col 57}{space 3}0.000{col 65}{space 4}-.1185043{col 78}{space 3}-.0782137
+{txt}{space 17}zed_sc {c |}{col 25}{res}{space 2} .0210971{col 37}{space 2} .0084583{col 48}{space 1}    2.49{col 57}{space 3}0.013{col 65}{space 4} .0045192{col 78}{space 3} .0376751
+{txt}{space 13}zhsserv_sc {c |}{col 25}{res}{space 2} .2349163{col 37}{space 2} .0041441{col 48}{space 1}   56.69{col 57}{space 3}0.000{col 65}{space 4} .2267939{col 78}{space 3} .2430386
+{txt}{space 6}i_zcrm_sc_zinc_sc {c |}{col 25}{res}{space 2} .0924982{col 37}{space 2} .0154658{col 48}{space 1}    5.98{col 57}{space 3}0.000{col 65}{space 4} .0621858{col 78}{space 3} .1228107
+{txt}{space 3}i_zemp_sc_zhsserv_sc {c |}{col 25}{res}{space 2} .1167804{col 37}{space 2} .0124758{col 48}{space 1}    9.36{col 57}{space 3}0.000{col 65}{space 4} .0923282{col 78}{space 3} .1412325
+{txt}{space 7}i_zed_sc_zemp_sc {c |}{col 25}{res}{space 2} .1187325{col 37}{space 2} .0153921{col 48}{space 1}    7.71{col 57}{space 3}0.000{col 65}{space 4} .0885646{col 78}{space 3} .1489005
+{txt}{space 3}i_zcrm_sc_zlivenv_sc {c |}{col 25}{res}{space 2}-.0887851{col 37}{space 2} .0041378{col 48}{space 1}  -21.46{col 57}{space 3}0.000{col 65}{space 4} -.096895{col 78}{space 3}-.0806751
+{txt}{space 2}i_zhlth_sc_zhsserv_sc {c |}{col 25}{res}{space 2}-.0676792{col 37}{space 2} .0066323{col 48}{space 1}  -10.20{col 57}{space 3}0.000{col 65}{space 4}-.0806782{col 78}{space 3}-.0546802
+{txt}{space 6}i_zcrm_sc_zemp_sc {c |}{col 25}{res}{space 2}-.0559917{col 37}{space 2} .0160445{col 48}{space 1}   -3.49{col 57}{space 3}0.000{col 65}{space 4}-.0874383{col 78}{space 3}-.0245452
+{txt}i_zhsserv_sc_zlivenv_sc {c |}{col 25}{res}{space 2} .0757068{col 37}{space 2} .0034263{col 48}{space 1}   22.10{col 57}{space 3}0.000{col 65}{space 4} .0689913{col 78}{space 3} .0824223
+{txt}{space 5}i_zemp_sc_zhlth_sc {c |}{col 25}{res}{space 2}-.0234387{col 37}{space 2} .0157866{col 48}{space 1}   -1.48{col 57}{space 3}0.138{col 65}{space 4}-.0543798{col 78}{space 3} .0075025
+{txt}{space 3}i_zinc_sc_zlivenv_sc {c |}{col 25}{res}{space 2}-.0388891{col 37}{space 2} .0132013{col 48}{space 1}   -2.95{col 57}{space 3}0.003{col 65}{space 4}-.0647632{col 78}{space 3}-.0130149
+{txt}{space 15}zhlth_sc {c |}{col 25}{res}{space 2}-.0675075{col 37}{space 2} .0095943{col 48}{space 1}   -7.04{col 57}{space 3}0.000{col 65}{space 4} -.086312{col 78}{space 3} -.048703
+{txt}{space 3}i_zemp_sc_zlivenv_sc {c |}{col 25}{res}{space 2} .0392807{col 37}{space 2} .0123042{col 48}{space 1}    3.19{col 57}{space 3}0.001{col 65}{space 4} .0151649{col 78}{space 3} .0633966
+{txt}{space 4}i_zed_sc_zlivenv_sc {c |}{col 25}{res}{space 2} .0334933{col 37}{space 2} .0065347{col 48}{space 1}    5.13{col 57}{space 3}0.000{col 65}{space 4} .0206857{col 78}{space 3}  .046301
+{txt}{space 7}i_zed_sc_zinc_sc {c |}{col 25}{res}{space 2}-.0916677{col 37}{space 2} .0136994{col 48}{space 1}   -6.69{col 57}{space 3}0.000{col 65}{space 4}-.1185181{col 78}{space 3}-.0648172
+{txt}{space 3}i_zcrm_sc_zhsserv_sc {c |}{col 25}{res}{space 2}-.0012117{col 37}{space 2} .0042954{col 48}{space 1}   -0.28{col 57}{space 3}0.778{col 65}{space 4}-.0096306{col 78}{space 3} .0072071
+{txt}{space 13}zlivenv_sc {c |}{col 25}{res}{space 2} .1187702{col 37}{space 2} .0047339{col 48}{space 1}   25.09{col 57}{space 3}0.000{col 65}{space 4}  .109492{col 78}{space 3} .1280485
+{txt}{space 5}i_zcrm_sc_zhlth_sc {c |}{col 25}{res}{space 2} .0234468{col 37}{space 2} .0082916{col 48}{space 1}    2.83{col 57}{space 3}0.005{col 65}{space 4} .0071955{col 78}{space 3} .0396981
+{txt}{space 2}i_zhlth_sc_zlivenv_sc {c |}{col 25}{res}{space 2} -.054274{col 37}{space 2}  .006969{col 48}{space 1}   -7.79{col 57}{space 3}0.000{col 65}{space 4}-.0679329{col 78}{space 3}-.0406151
+{txt}{space 4}i_zed_sc_zhsserv_sc {c |}{col 25}{res}{space 2} .0129875{col 37}{space 2} .0065974{col 48}{space 1}    1.97{col 57}{space 3}0.049{col 65}{space 4} .0000569{col 78}{space 3} .0259181
+{txt}{space 7}i_zcrm_sc_zed_sc {c |}{col 25}{res}{space 2}-.0287264{col 37}{space 2} .0084045{col 48}{space 1}   -3.42{col 57}{space 3}0.001{col 65}{space 4}-.0451989{col 78}{space 3}-.0122539
+{txt}{space 23} {c |}
+{space 13}supergroup {c |}
+{space 21}2  {c |}{col 25}{res}{space 2}-.0358467{col 37}{space 2} .0099897{col 48}{space 1}   -3.59{col 57}{space 3}0.000{col 65}{space 4}-.0554261{col 78}{space 3}-.0162672
+{txt}{space 21}3  {c |}{col 25}{res}{space 2}-.5195768{col 37}{space 2}  .021006{col 48}{space 1}  -24.73{col 57}{space 3}0.000{col 65}{space 4}-.5607478{col 78}{space 3}-.4784057
+{txt}{space 21}4  {c |}{col 25}{res}{space 2}-.4737847{col 37}{space 2}  .017156{col 48}{space 1}  -27.62{col 57}{space 3}0.000{col 65}{space 4}-.5074098{col 78}{space 3}-.4401596
+{txt}{space 21}5  {c |}{col 25}{res}{space 2}-.3145789{col 37}{space 2} .0128302{col 48}{space 1}  -24.52{col 57}{space 3}0.000{col 65}{space 4}-.3397256{col 78}{space 3}-.2894321
+{txt}{space 21}6  {c |}{col 25}{res}{space 2}-.4161044{col 37}{space 2} .0135595{col 48}{space 1}  -30.69{col 57}{space 3}0.000{col 65}{space 4}-.4426806{col 78}{space 3}-.3895283
+{txt}{space 21}7  {c |}{col 25}{res}{space 2}-.2327133{col 37}{space 2} .0144585{col 48}{space 1}  -16.10{col 57}{space 3}0.000{col 65}{space 4}-.2610514{col 78}{space 3}-.2043753
+{txt}{space 21}8  {c |}{col 25}{res}{space 2}-.0253056{col 37}{space 2} .0335146{col 48}{space 1}   -0.76{col 57}{space 3}0.450{col 65}{space 4}-.0909929{col 78}{space 3} .0403817
+{txt}{space 23} {c |}
+{space 18}_cons {c |}{col 25}{res}{space 2} .2425889{col 37}{space 2} .0259282{col 48}{space 1}    9.36{col 57}{space 3}0.000{col 65}{space 4} .1917706{col 78}{space 3} .2934071
+{txt}{hline 24}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+{txt}{hline 29}{c TT}{hline 48}
+{col 3}Random-effects parameters{col 30}{c |}{col 34}Estimate{col 45}Std. err.{col 59}[95% conf. interval]
+{hline 29}{c +}{hline 48}
+{res}la_codenum{txt}: Identity{col 30}{c |}
+{space 18}var(_cons) {c |}{res}{col 33} .1765376{col 44}  .014666{col 58} .1500109{col 70}  .207755
+{txt}{hline 29}{c +}{hline 48}
+{col 16}var(Residual){col 30}{c |}{res}{col 33} .2527449{col 44} .0020146{col 58}  .248827{col 70} .2567246
+{txt}{hline 29}{c BT}{hline 48}
+LR test vs. linear model:{col 27}{help j_chibar##|_new:chibar2(01) =} {res}10203.30{col 55}{txt}Prob >= chibar2 = {col 73}{res}0.0000
+{txt}
+{com}. 
+. 
+. 
+. 
+. 
+. 
+. global mainvars zwinc_sc  zwemp_sc zwhlth_sc zwed_sc zwacc_sc zwhouse_sc zwcrime_sc zwenv_sc
+{txt}
+{com}. 
+. 
+. capture drop i_*
+{txt}
+{com}. foreach v1 in $mainvars {c -(}
+{txt}  2{com}.     foreach v2 in $mainvars {c -(}
+{txt}  3{com}.         if "`v1'" < "`v2'" {c -(}
+{txt}  4{com}.             gen i_`v1'_`v2' = `v1' * `v2'
+{txt}  5{com}.         {c )-}
+{txt}  6{com}.     {c )-}
+{txt}  7{com}. {c )-}
+{txt}(60,251 missing values generated)
+(60,251 missing values generated)
+(60,251 missing values generated)
+(60,251 missing values generated)
+(60,251 missing values generated)
+(60,251 missing values generated)
+(60,251 missing values generated)
+(60,251 missing values generated)
+(60,251 missing values generated)
+(60,251 missing values generated)
+(60,251 missing values generated)
+(60,251 missing values generated)
+(60,251 missing values generated)
+(60,251 missing values generated)
+(60,251 missing values generated)
+(60,251 missing values generated)
+(60,251 missing values generated)
+(60,251 missing values generated)
+(60,251 missing values generated)
+(60,251 missing values generated)
+(60,251 missing values generated)
+(60,251 missing values generated)
+(60,251 missing values generated)
+(60,251 missing values generated)
+(60,251 missing values generated)
+(60,251 missing values generated)
+(60,251 missing values generated)
+(60,251 missing values generated)
+
+{com}. 
+. 
+. 
+. 
+. mixed zfd  zwemp_sc zwacc_sc i_zwemp_sc_zwinc_sc zwhlth_sc i_zwemp_sc_zwhlth_sc zwinc_sc zwcrime_sc zwenv_sc i_zwcrime_sc_zwhlth_sc i_zwacc_sc_zwhlth_sc i_zwacc_sc_zwcrime_sc zwhouse_sc i_zwenv_sc_zwhouse_sc i_zwcrime_sc_zwhouse_sc i_zwhouse_sc_zwinc_sc i_zwed_sc_zwhlth_sc i_zwcrime_sc_zwenv_sc i.supergroup if nation=="Wales" || la_codenum:
+{res}
+{txt}Performing EM optimization ...
+{res}
+{txt}Performing gradient-based optimization: 
+{res}{txt}Iteration 0:{space 2}Log likelihood = {res:-1769.2091}  
+Iteration 1:{space 2}Log likelihood = {res:-1769.2091}  
+{res}
+{txt}Computing standard errors ...
+{res}
+{txt}Mixed-effects ML regression{col 53}Number of obs{col 69} = {res}  1,837
+{txt}Group variable: {res}la_codenum{col 53}{txt}Number of groups{col 69} = {res}     22
+{txt}{col 53}Obs per group:
+{col 66}min = {res}     33
+{txt}{col 66}avg = {res}   83.5
+{txt}{col 66}max = {res}    208
+{col 53}{txt}Wald chi2({res}24{txt}){col 69} = {res}2748.89
+{txt}Log likelihood = {res}-1769.2091{col 53}{txt}Prob > chi2{col 69} = {res} 0.0000
+
+{txt}{hline 24}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1}                    zfd{col 25}{c |} Coefficient{col 37}  Std. err.{col 49}      z{col 57}   P>|z|{col 65}     [95% con{col 78}f. interval]
+{hline 24}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 15}zwemp_sc {c |}{col 25}{res}{space 2} .5067276{col 37}{space 2} .0565484{col 48}{space 1}    8.96{col 57}{space 3}0.000{col 65}{space 4} .3958947{col 78}{space 3} .6175605
+{txt}{space 15}zwacc_sc {c |}{col 25}{res}{space 2}  .414407{col 37}{space 2} .0256632{col 48}{space 1}   16.15{col 57}{space 3}0.000{col 65}{space 4}  .364108{col 78}{space 3}  .464706
+{txt}{space 4}i_zwemp_sc_zwinc_sc {c |}{col 25}{res}{space 2}-.2033807{col 37}{space 2} .0384695{col 48}{space 1}   -5.29{col 57}{space 3}0.000{col 65}{space 4}-.2787795{col 78}{space 3}-.1279819
+{txt}{space 14}zwhlth_sc {c |}{col 25}{res}{space 2}-.3028125{col 37}{space 2} .0574136{col 48}{space 1}   -5.27{col 57}{space 3}0.000{col 65}{space 4}-.4153411{col 78}{space 3} -.190284
+{txt}{space 3}i_zwemp_sc_zwhlth_sc {c |}{col 25}{res}{space 2} .1222872{col 37}{space 2} .0414387{col 48}{space 1}    2.95{col 57}{space 3}0.003{col 65}{space 4} .0410688{col 78}{space 3} .2035056
+{txt}{space 15}zwinc_sc {c |}{col 25}{res}{space 2} .4020467{col 37}{space 2} .0693804{col 48}{space 1}    5.79{col 57}{space 3}0.000{col 65}{space 4} .2660637{col 78}{space 3} .5380297
+{txt}{space 13}zwcrime_sc {c |}{col 25}{res}{space 2} -.300956{col 37}{space 2}  .031731{col 48}{space 1}   -9.48{col 57}{space 3}0.000{col 65}{space 4}-.3631476{col 78}{space 3}-.2387643
+{txt}{space 15}zwenv_sc {c |}{col 25}{res}{space 2}-.0026666{col 37}{space 2} .0010929{col 48}{space 1}   -2.44{col 57}{space 3}0.015{col 65}{space 4}-.0048086{col 78}{space 3}-.0005247
+{txt}{space 1}i_zwcrime_sc_zwhlth_sc {c |}{col 25}{res}{space 2} .1093915{col 37}{space 2} .0196066{col 48}{space 1}    5.58{col 57}{space 3}0.000{col 65}{space 4} .0709632{col 78}{space 3} .1478198
+{txt}{space 3}i_zwacc_sc_zwhlth_sc {c |}{col 25}{res}{space 2}-.1176924{col 37}{space 2} .0336291{col 48}{space 1}   -3.50{col 57}{space 3}0.000{col 65}{space 4}-.1836043{col 78}{space 3}-.0517805
+{txt}{space 2}i_zwacc_sc_zwcrime_sc {c |}{col 25}{res}{space 2}-.1115235{col 37}{space 2} .0303137{col 48}{space 1}   -3.68{col 57}{space 3}0.000{col 65}{space 4}-.1709372{col 78}{space 3}-.0521097
+{txt}{space 13}zwhouse_sc {c |}{col 25}{res}{space 2} .1589064{col 37}{space 2} .0268893{col 48}{space 1}    5.91{col 57}{space 3}0.000{col 65}{space 4} .1062043{col 78}{space 3} .2116085
+{txt}{space 2}i_zwenv_sc_zwhouse_sc {c |}{col 25}{res}{space 2}-.0021081{col 37}{space 2} .0006538{col 48}{space 1}   -3.22{col 57}{space 3}0.001{col 65}{space 4}-.0033897{col 78}{space 3}-.0008266
+{txt}i_zwcrime_sc_zwhouse_sc {c |}{col 25}{res}{space 2}-.0454447{col 37}{space 2} .0186422{col 48}{space 1}   -2.44{col 57}{space 3}0.015{col 65}{space 4}-.0819827{col 78}{space 3}-.0089066
+{txt}{space 2}i_zwhouse_sc_zwinc_sc {c |}{col 25}{res}{space 2} .0025877{col 37}{space 2} .0200816{col 48}{space 1}    0.13{col 57}{space 3}0.897{col 65}{space 4}-.0367716{col 78}{space 3} .0419469
+{txt}{space 4}i_zwed_sc_zwhlth_sc {c |}{col 25}{res}{space 2} .0487026{col 37}{space 2} .0211958{col 48}{space 1}    2.30{col 57}{space 3}0.022{col 65}{space 4} .0071596{col 78}{space 3} .0902457
+{txt}{space 2}i_zwcrime_sc_zwenv_sc {c |}{col 25}{res}{space 2} .0016567{col 37}{space 2} .0007826{col 48}{space 1}    2.12{col 57}{space 3}0.034{col 65}{space 4} .0001228{col 78}{space 3} .0031905
+{txt}{space 23} {c |}
+{space 13}supergroup {c |}
+{space 21}2  {c |}{col 25}{res}{space 2} .0438269{col 37}{space 2} .0441878{col 48}{space 1}    0.99{col 57}{space 3}0.321{col 65}{space 4}-.0427797{col 78}{space 3} .1304334
+{txt}{space 21}3  {c |}{col 25}{res}{space 2}-.6592396{col 37}{space 2} .1398802{col 48}{space 1}   -4.71{col 57}{space 3}0.000{col 65}{space 4}-.9333998{col 78}{space 3}-.3850793
+{txt}{space 21}4  {c |}{col 25}{res}{space 2}-.4108355{col 37}{space 2} .1470729{col 48}{space 1}   -2.79{col 57}{space 3}0.005{col 65}{space 4}-.6990931{col 78}{space 3}-.1225778
+{txt}{space 21}5  {c |}{col 25}{res}{space 2}-.3966235{col 37}{space 2} .1041551{col 48}{space 1}   -3.81{col 57}{space 3}0.000{col 65}{space 4}-.6007638{col 78}{space 3}-.1924832
+{txt}{space 21}6  {c |}{col 25}{res}{space 2}-.5222916{col 37}{space 2}  .076003{col 48}{space 1}   -6.87{col 57}{space 3}0.000{col 65}{space 4}-.6712547{col 78}{space 3}-.3733285
+{txt}{space 21}7  {c |}{col 25}{res}{space 2}-.1347553{col 37}{space 2} .0589423{col 48}{space 1}   -2.29{col 57}{space 3}0.022{col 65}{space 4}-.2502801{col 78}{space 3}-.0192305
+{txt}{space 21}8  {c |}{col 25}{res}{space 2}-.0842055{col 37}{space 2} .1644201{col 48}{space 1}   -0.51{col 57}{space 3}0.609{col 65}{space 4}-.4064629{col 78}{space 3} .2380519
+{txt}{space 23} {c |}
+{space 18}_cons {c |}{col 25}{res}{space 2} .5772945{col 37}{space 2} .1018749{col 48}{space 1}    5.67{col 57}{space 3}0.000{col 65}{space 4} .3776233{col 78}{space 3} .7769657
+{txt}{hline 24}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}
+{txt}{hline 29}{c TT}{hline 48}
+{col 3}Random-effects parameters{col 30}{c |}{col 34}Estimate{col 45}Std. err.{col 59}[95% conf. interval]
+{hline 29}{c +}{hline 48}
+{res}la_codenum{txt}: Identity{col 30}{c |}
+{space 18}var(_cons) {c |}{res}{col 33} .1745007{col 44} .0553552{col 58} .0937084{col 70} .3249494
+{txt}{hline 29}{c +}{hline 48}
+{col 16}var(Residual){col 30}{c |}{res}{col 33} .3850571{col 44} .0127851{col 58} .3607967{col 70} .4109489
+{txt}{hline 29}{c BT}{hline 48}
+LR test vs. linear model:{col 27}{help j_chibar##|_new:chibar2(01) =} {res}351.45{col 55}{txt}Prob >= chibar2 = {col 73}{res}0.0000
+{txt}
+{com}. 
+. save  "E:\16GBBACKUPUSB\BACKUP_USB_SEPTEMBER2014\May Baydoun_folder\UK_BIOBANK_PROJECT\UKB_PAPER20_ADI_FOODESERT\DATA\UK_fooddesertdatafinalizedIMD_mergedfinalizedfin.dta",replace
+{txt}{p 0 4 2}
+file {bf}
+E:\16GBBACKUPUSB\BACKUP_USB_SEPTEMBER2014\May Baydoun_folder\UK_BIOBANK_PROJECT\UKB_PAPER20_ADI_FOODESERT\DATA\UK_fooddesertdatafinalizedIMD_mergedfinalizedfin.dta{rm}
+saved
+{p_end}
+
+{com}. 
+. 
+. capture log close
+{smcl}
+{com}{sf}{ul off}
