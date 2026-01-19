@@ -1,5 +1,6 @@
+
 capture log close
-capture log using "E:\16GBBACKUPUSB\BACKUP_USB_SEPTEMBER2014\May Baydoun_folder\UK_BIOBANK_PROJECT\UKB_PAPER20_ADI_FOODESERT\OUTPUT\DATA_MANAGEMENT.smcl"
+capture log using "E:\16GBBACKUPUSB\BACKUP_USB_SEPTEMBER2014\May Baydoun_folder\UK_BIOBANK_PROJECT\UKB_PAPER20_ADI_FOODESERT\OUTPUT\DATA_MANAGEMENT.smcl",replace
 
 
 **Food desert data**
@@ -257,6 +258,86 @@ reg zfd zsoa_pctinv if Country=="Scottland"
 lpoly zfd zsoa_pctinv if Country=="Scottland"
 
 graph save "E:\16GBBACKUPUSB\BACKUP_USB_SEPTEMBER2014\May Baydoun_folder\UK_BIOBANK_PROJECT\UKB_PAPER20_ADI_FOODESERT\FIGURES\FIGURE2C.gph",replace
+
+
+
+capture log close
+capture log using "E:\16GBBACKUPUSB\BACKUP_USB_SEPTEMBER2014\May Baydoun_folder\UK_BIOBANK_PROJECT\UKB_PAPER20_ADI_FOODESERT\OUTPUT\DATA_MANAGEMENT_LSOA_LIST.txt", text replace
+
+
+cd "E:\16GBBACKUPUSB\BACKUP_USB_SEPTEMBER2014\May Baydoun_folder\UK_BIOBANK_PROJECT\UKB_PAPER20_ADI_FOODESERT\DATA"
+
+use UK_fooddesertdatafinalizedIMD_merged,clear
+
+bysort cluster_ordered: list lsoa11
+
+
+**Get Area in R**
+
+**library(sf)
+**library(dplyr)
+**library(haven)
+
+**shp_path <- "C:/Users/jmw596/Downloads/infuse_lsoa_lyr_2011_clipped/infuse_lsoa_lyr_2011_clipped.shp"   # or full path to the .shp
+
+**gdf <- st_read(shp_path, quiet = FALSE)
+**print(names(gdf))
+**gdf <- st_transform(gdf, 27700)
+
+**gdf <- as.data.frame(gdf %>%
+**  mutate(area_km2 = as.numeric(st_area(geometry)) / 1e6)) %>%
+**  select(-c(geometry))
+
+**write_dta(gdf, "lsoa2011_area_km2.dta")
+
+use lsoa2011_area_km2.dta,clear
+
+capture drop lsoa11
+gen lsoa11=geo_code
+
+sort lsoa11
+
+save lsoa2011_area_km2,replace 
+
+use UK_fooddesertdatafinalizedIMD_merged,clear
+
+sort lsoa11
+
+save UK_fooddesertdatafinalizedIMD_merged,replace
+
+merge lsoa11 using lsoa2011_area_km2
+
+save UK_fooddesertdatafinalizedIMD_merged,replace
+
+bysort cluster_ordered: su area_km2
+
+**----------------------------------------------------------------------------------------------------------------------------------------
+**-> cluster_ordered = Low-Low
+**
+**    Variable |        Obs        Mean    Std. dev.       Min        Max
+**-------------+---------------------------------------------------------
+**    area_km2 |     13,487    1.221803    3.283567   .0181287   183.0458
+**
+**----------------------------------------------------------------------------------------------------------------------------------------
+**-> cluster_ordered = M-H, M-L
+**
+**    Variable |        Obs        Mean    Std. dev.       Min        Max
+**-------------+---------------------------------------------------------
+**    area_km2 |     14,966    9.196109    34.76696    .015549   1004.007
+**
+**----------------------------------------------------------------------------------------------------------------------------------------
+**-> cluster_ordered = High-High
+**
+**    Variable |        Obs        Mean    Std. dev.       Min        Max
+**-------------+---------------------------------------------------------
+**    area_km2 |     13,276    5.652416    29.41317   .0093673    1162.51
+
+
+save UK_fooddesertdatafinalizedIMD_merged,replace
+
+
+capture log close
+
 
 
 capture log close
