@@ -304,10 +304,11 @@ use UK_fooddesertdatafinalizedIMD_merged,clear
 sort lsoa11
 
 save UK_fooddesertdatafinalizedIMD_merged,replace
+capture drop _merge
 
 merge lsoa11 using lsoa2011_area_km2
 
-save UK_fooddesertdatafinalizedIMD_merged,replace
+save UK_fooddesertdatafinalizedIMD_mergedfin,replace
 
 bysort cluster_ordered: su area_km2
 
@@ -333,12 +334,254 @@ bysort cluster_ordered: su area_km2
 **    area_km2 |     13,276    5.652416    29.41317   .0093673    1162.51
 
 
-save UK_fooddesertdatafinalizedIMD_merged,replace
+save UK_fooddesertdatafinalizedIMD_mergedfin,replace
 
+
+ graph bar (mean) area_km2, over(nation) over(cluster_ordered)
+ 
+ graph save "FIGURE1_PANELD.gph",replace
 
 capture log close
 
+**R SCRIPT FOR MORE DETAILED PANEL D**
 
+###############################################################################
+# FIGURE: 3 panels of mean area (km^2) by Nation ×
+#   Panel D.1: EFDI quartiles (zfd_cluster -> zfd_q)
+#   Panel D.2: IMD quartiles  (zsoa_pctinv_cluster -> imd_q)
+#   Panel D.3: Ordered EFDI/IMD clusters (cluster_ordered -> cl_ord)
+#
+# Adds Bonferroni-corrected p-values and significance stars:
+#   *   p < 0.05
+#   **  p < 0.010
+#   *** p < 0.001
+#
+# FIX for your rstatix error:
+# - Do NOT use rstatix::anova_test() output directly inside mutate/transmute + p.adjust
+# - Use base R summary(aov()) to get a plain numeric p-value per stratum
+###############################################################################
+
+# ---- 0) Packages ----
+pkgs <- c("haven","dplyr","tidyr","stringr","forcats","ggplot2","patchwork","readr")
+to_install <- pkgs[!pkgs %in% rownames(installed.packages())]
+if (length(to_install)) install.packages(to_install)
+invisible(lapply(pkgs, library, character.only = TRUE))
+
+# ---- 1) Helpers ----
+p_to_stars <- function(p){
+  dplyr::case_when(
+    is.na(p)  ~ "",
+    p < 0.001 ~ "***",
+    p < 0.010 ~ "**",
+    p < 0.05  ~ "*",
+    TRUE      ~ ""
+  )
+}
+
+# safe ANOVA p-value extractor (returns numeric scalar or NA)
+anova_p <- function(df, formula){
+  # Need >=2 groups and >=2 non-missing rows
+  d <- df %>% dplyr::filter(stats::complete.cases(stats::model.frame(formula, data = df)))
+  if (nrow(d) < 3) return(NA_real_)
+  mm <- stats::model.frame(formula, data = d)
+  # response + one factor
+  if (ncol(mm) < 2) return(NA_real_)
+  g <- mm[[2]]
+  if (!is.factor(g)) g <- factor(g)
+  if (nlevels(g) < 2) return(NA_real_)
+  fit <- stats::aov(formula, data = d)
+  sm <- summary(fit)
+  # first term p-value
+  p <- tryCatch(as.numeric(sm[[1]][["Pr(>F)"]][1]), error = function(e) NA_real_)
+  p
+}
+
+# ---- 2) File paths (EDIT THESE) ----
+infile <- "E:/16GBBACKUPUSB/BACKUP_USB_SEPTEMBER2014/May Baydoun_folder/UK_BIOBANK_PROJECT/UKB_PAPER20_ADI_FOODESERT/DATA/UK_fooddesertdatafinalizedIMD_mergedfin.dta"
+
+out_png <- "E:/16GBBACKUPUSB/BACKUP_USB_SEPTEMBER2014/May Baydoun_folder/UK_BIOBANK_PROJECT/UKB_PAPER20_ADI_FOODESERT/FIGURES/FIGURE_area_3panel_bonferroni.png"
+
+out_csv <- "E:/16GBBACKUPUSB/BACKUP_USB_SEPTEMBER2014/May Baydoun_folder/UK_BIOBANK_PROJECT/UKB_PAPER20_ADI_FOODESERT/OUTPUT/area_bonferroni_pvalues.csv"
+
+# ---- 3) Read data ----
+df <- haven::read_dta(infile)
+
+# ---- 4) Harmonize nation variable (SAFE) ----
+if ("nation" %in% names(df)) {
+  df <- df %>% mutate(nation = as.character(nation))
+} else if ("Country" %in% names(df)) {
+  df <- df %>% mutate(nation = as.character(Country))
+} else {
+  stop("No nation or Country variable found. Columns:\n", paste(names(df), collapse = ", "))
+}
+df <- df %>% mutate(nation = stringr::str_trim(nation))
+
+# OPTIONAL: enforce desired order
+# df <- df %>% mutate(nation = factor(nation, levels = c("England","Scotland","Wales")))
+
+# ---- 5) Create factor versions of cluster variables (match Stata) ----
+df <- df %>%
+  mutate(
+    zfd_cluster = as.integer(zfd_cluster),
+    zsoa_pctinv_cluster = as.integer(zsoa_pctinv_cluster),
+    cluster_ordered = as.integer(cluster_ordered),
+    
+    zfd_q = factor(zfd_cluster, levels = 1:4,
+                   labels = c("EFDI Q1 (lowest)","EFDI Q2","EFDI Q3","EFDI Q4 (highest)")),
+    imd_q = factor(zsoa_pctinv_cluster, levels = 1:4,
+                   labels = c("IMD Q1 (lowest)","IMD Q2","IMD Q3","IMD Q4 (highest)")),
+    cl_ord = factor(cluster_ordered, levels = c(0,1,2),
+                    labels = c("Low-Low","M-H, M-L","High-High"))
+  )
+
+# ---- 6) Core function to build each panel + Bonferroni stars ----
+make_panel <- function(dat, group_var, panel_title){
+  
+  d <- dat %>%
+    filter(!is.na(area_km2), !is.na(nation), !is.na(.data[[group_var]])) %>%
+    mutate(
+      nation = factor(nation),
+      grp    = factor(.data[[group_var]])
+    )
+  
+  # Summary for bars
+  sumdat <- d %>%
+    group_by(nation, grp) %>%
+    summarise(
+      n = n(),
+      mean = mean(area_km2, na.rm = TRUE),
+      se = sd(area_km2, na.rm = TRUE) / sqrt(n),
+      .groups = "drop"
+    )
+  
+  # (1) Across nations within each cluster level: p(nation | grp)
+  p_nation_by_grp <- d %>%
+    group_by(grp) %>%
+    summarise(
+      p_raw = anova_p(cur_data(), area_km2 ~ nation),
+      .groups = "drop"
+    ) %>%
+    mutate(
+      p_bonf = p.adjust(p_raw, method = "bonferroni"),
+      stars_nation = p_to_stars(p_bonf)
+    )
+  
+  # Legend labels with stars appended
+  grp_levels <- levels(d$grp)
+  grp_label_df <- tibble(grp = factor(grp_levels, levels = grp_levels)) %>%
+    left_join(p_nation_by_grp, by = "grp") %>%
+    mutate(legend_lab = paste0(as.character(grp), stars_nation))
+  
+  legend_map <- setNames(grp_label_df$legend_lab, as.character(grp_label_df$grp))
+  
+  # (2) Within each nation across cluster levels: p(grp | nation)
+  p_grp_by_nation <- d %>%
+    group_by(nation) %>%
+    summarise(
+      p_raw = anova_p(cur_data(), area_km2 ~ grp),
+      .groups = "drop"
+    ) %>%
+    mutate(
+      p_bonf = p.adjust(p_raw, method = "bonferroni"),
+      stars_within_nation = p_to_stars(p_bonf)
+    )
+  
+  # y position for nation-level stars
+  ystars <- sumdat %>%
+    group_by(nation) %>%
+    summarise(y = max(mean + se, na.rm = TRUE) * 1.08, .groups = "drop") %>%
+    left_join(p_grp_by_nation, by = "nation")
+  
+  # Plot
+  p <- ggplot(sumdat, aes(x = nation, y = mean, fill = grp)) +
+    geom_col(position = position_dodge(width = 0.85), width = 0.75) +
+    geom_errorbar(
+      aes(ymin = mean - se, ymax = mean + se),
+      position = position_dodge(width = 0.85),
+      width = 0.20
+    ) +
+    geom_text(
+      data = ystars,
+      aes(x = nation, y = y, label = stars_within_nation),
+      inherit.aes = FALSE,
+      vjust = 0,
+      size = 5
+    ) +
+    labs(
+      title = panel_title,
+      x = NULL,
+      y = "Mean area (km^2)",
+      fill = "Cluster level\n(legend stars = across nations,\nBonferroni)"
+    ) +
+    scale_fill_discrete(labels = legend_map) +
+    theme_classic(base_size = 12) +
+    theme(
+      plot.title = element_text(face = "bold"),
+      legend.position = "right"
+    )
+  
+  list(
+    plot = p,
+    nation_diff_within_cluster = p_nation_by_grp %>%
+      mutate(panel = panel_title, test = "Across nations within cluster"),
+    cluster_diff_within_nation = p_grp_by_nation %>%
+      mutate(panel = panel_title, test = "Within nation across clusters")
+  )
+}
+
+# ---- 7) Build three panels ----
+res_A <- make_panel(df, "zfd_q",  "Panel D.1 Area by Nation × EFDI quartiles")
+res_B <- make_panel(df, "imd_q",  "Panel D.2 Area by Nation × IMD quartiles")
+res_C <- make_panel(df, "cl_ord", "Panel D.3 Area by Nation × Ordered EFDI/IMD clusters")
+
+# ---- 8) Combine ----
+fig_3panel <- (res_A$plot / res_B$plot / res_C$plot) +
+  patchwork::plot_annotation(
+    caption = paste(
+      "Legend stars: Bonferroni-adjusted omnibus p for differences ACROSS NATIONS within each cluster level.",
+      "Stars above nations: Bonferroni-adjusted omnibus p for differences ACROSS CLUSTER LEVELS within each nation.",
+      "(* p<0.05; ** p<0.010; *** p<0.001).",
+      sep = "\n"
+    )
+  )
+
+print(fig_3panel)
+
+# ---- 9) Export figure ----
+ggsave(out_png, fig_3panel, width = 10, height = 14, dpi = 300)
+
+# ---- 10) Export p-values ----
+pvals_out <- bind_rows(
+  res_A$nation_diff_within_cluster,
+  res_B$nation_diff_within_cluster,
+  res_C$nation_diff_within_cluster,
+  res_A$cluster_diff_within_nation,
+  res_B$cluster_diff_within_nation,
+  res_C$cluster_diff_within_nation
+) %>%
+  mutate(stars = p_to_stars(p_bonf))
+
+readr::write_csv(pvals_out, out_csv)
+
+###############################################################################
+# OPTIONAL: If you want a nonparametric alternative (safer for skewed area):
+# - Replace anova_p(...) with kruskal.test(...) p-values in anova_p()
+###############################################################################
+# kruskal_p <- function(df, formula){
+#   d <- df %>% dplyr::filter(stats::complete.cases(stats::model.frame(formula, data = df)))
+#   if (nrow(d) < 3) return(NA_real_)
+#   mm <- stats::model.frame(formula, data = d)
+#   g <- mm[[2]]
+#   if (!is.factor(g)) g <- factor(g)
+#   if (nlevels(g) < 2) return(NA_real_)
+#   out <- tryCatch(kruskal.test(formula, data = d)$p.value, error = function(e) NA_real_)
+#   as.numeric(out)
+# }
+###############################################################################
+
+
+
+*************************************
 
 capture log close
 capture log using "E:\16GBBACKUPUSB\BACKUP_USB_SEPTEMBER2014\May Baydoun_folder\UK_BIOBANK_PROJECT\UKB_PAPER20_ADI_FOODESERT\OUTPUT\TABLE1.smcl",replace
